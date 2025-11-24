@@ -202,3 +202,10 @@ h1 {
 .home-wrapper {
   transform: translateY(-40px);
 }
+
+.home-footer {
+  display: flex;
+  flex-direction: column;   /* 🔥 coloca cada span en una línea */
+  gap: 4px;                  /* separación entre líneas */
+  text-align: center;        /* opcional: centrar texto */
+}
