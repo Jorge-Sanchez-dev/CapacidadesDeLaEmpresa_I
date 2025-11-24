@@ -28,3 +28,6 @@ const userSchema = new Schema(
 );
 
 export default model("User", userSchema);
+
+
+// tambien tiene que tener, el salfo hactual, un array de ultimas trasnferencias, 
