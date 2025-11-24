@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registro</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="home-body">
+
+  <div class="home-wrapper">
+
+    <header class="home-header">
+      <img src="/logo sin fondo.png" alt="Banco Sánchez" class="logo" />
+      <h1>Crear cuenta</h1>
+    </header>
+
+    <div class="form-card">
+      <form id="register-form" class="form">
+        <input type="text" id="name" placeholder="Nombre" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Contraseña" required />
+        <button type="submit" class="btn primary">Registrarse</button>
+      </form>
+
+      <p id="msg" class="msg"></p>
+
+      <p class="alt-link">
+        ¿Ya tienes cuenta?
+        <a href="/login.html">Inicia sesión</a>
+      </p>
+    </div>
+
+  </div>
+
+  <script src="/main.js"></script>
+</body>
+</html>

@@ -8,7 +8,9 @@
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true
+    "declaration": false, // <- para dev mejor quitarlo
+    "incremental": true   // <- guarda info de compilaciones
   },
   "include": ["src"],
+  "exclude": ["dist", "node_modules"] // <- importante
 }

@@ -1,22 +1,19 @@
+//mongo.ts
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 
-import { Db, MongoClient } from "mongodb";
+dotenv.config();
 
-
-let client: MongoClient;
-let dB: Db;
-const dbName = "WEB";
-
-export const connectMongoDB = async (): Promise<void> => {
+export const connectMongoDB = async () => {
+  console.log(">>> connectMongoDB llamado");
   try {
-    const mongoUrl = `mongodb+srv://${process.env.USER_MONGO}:${process.env.USER_PASSWORD}@${process.env.MONGO_CLUSTER}.jwrpu.mongodb.net/?appName=${process.env.MONGO_APP_NAME}`;
+    const mongoUrl = "mongodb+srv://jsanchezl5:125343Jj@jorge-nebrija.jwrpu.mongodb.net/?appName=Jorge-Nebrija";
 
-    client = new MongoClient(mongoUrl);
-    await client.connect();
-    dB = client.db(dbName);
-    console.log("Connected to mongodb at db " + dbName);
+    console.log(">>> Intentando conectar a Mongo...");
+    await mongoose.connect(mongoUrl);
+
+    console.log("MongoDB conectado con Mongoose ✔");
   } catch (error) {
-    console.log("Error mongo: ", error);
+    console.error("Error conectando a MongoDB:", error);
   }
 };
-
-export const getDb = ():Db => dB;
