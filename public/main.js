@@ -23,30 +23,83 @@ if (loginForm) {
       localStorage.setItem("token", data.token);
 
       msg.textContent = "Login correcto ✔";
-      window.location.href = "/secure.html";
+      window.location.href = "/dashboard.html";
     } catch (err) {
       msg.textContent = "Error: " + err.message;
     }
   });
 }
 
-// ZONA SEGURA
-const getDataBtn = document.getElementById("get-data");
 
-if (getDataBtn) {
-  getDataBtn.addEventListener("click", async () => {
-    const token = localStorage.getItem("token");
 
-    const res = await fetch("/auth/me", {
-      headers: {
-        Authorization: "Bearer " + token,
-      },
-    });
+// REGISTRO 
+const registerForm = document.getElementById("register-form");
+const msg2 = document.getElementById("msg");
 
-    const data = await res.json();
-    document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+if (registerForm) {
+  registerForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Datos básicos
+    const name = document.getElementById("name").value;
+    const surname = document.getElementById("surname").value;
+    const birthDate = document.getElementById("birthDate").value;
+    const dni = document.getElementById("dni").value;
+    const country = document.getElementById("country").value;
+    const city = document.getElementById("city").value;
+    const address = document.getElementById("address").value;
+    const postalCode = document.getElementById("postalCode").value;
+
+    // Contacto y acceso
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    // Moneda
+    const mainCurrency = document.getElementById("mainCurrency").value;
+
+    if (password !== confirmPassword) {
+      msg2.textContent = "Las contraseñas no coinciden";
+      return;
+    }
+
+    try {
+      const res = await fetch("/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          surname,
+          birthDate,
+          dni,
+          country,
+          city,
+          address,
+          postalCode,
+          email,
+          phone,
+          password,
+          mainCurrency,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message);
+
+      msg2.textContent = "Registro exitoso ✔ Redirigiendo...";
+      setTimeout(() => {
+        window.location.href = "/login.html";
+      }, 1500);
+
+    } catch (err) {
+      msg2.textContent = "Error: " + err.message;
+    }
   });
 }
+
+
 
 // LOGOUT
 const logoutBtn = document.getElementById("logout");
