@@ -1,6 +1,6 @@
-//routes/auth.ts
+// src/routes/auth.ts
 import { Router } from "express";
-import { register, login, me } from "../controllers/authController";
+import { register, login, me, dashboard } from "../controllers/authController";
 import { verifyToken } from "../middleware/verifyToken";
 
 const router = Router();
@@ -8,5 +8,8 @@ const router = Router();
 router.post("/register", register);
 router.post("/login", login);
 router.get("/me", verifyToken, me);
+
+// 👇 Nueva ruta para el panel
+router.get("/dashboard", verifyToken, dashboard);
 
 export default router;

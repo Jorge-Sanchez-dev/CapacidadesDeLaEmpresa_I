@@ -1,111 +1,148 @@
-// LOGIN
-const loginForm = document.getElementById("login-form");
-const msg = document.getElementById("msg");
+// main.js
 
-if (loginForm) {
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
+  // ========================
+  // LOGIN
+  // ========================
+  const loginForm = document.getElementById("login-form");
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+  if (loginForm) {
+    const msg = document.getElementById("msg");
 
-    try {
-      const res = await fetch("/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-      const data = await res.json();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
 
-      if (!res.ok) throw new Error(data.message);
+      if (msg) {
+        msg.textContent = "";
+      }
 
-      localStorage.setItem("token", data.token);
+      try {
+        const res = await fetch("/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
 
-      msg.textContent = "Login correcto ✔";
-      window.location.href = "/dashboard.html";
-    } catch (err) {
-      msg.textContent = "Error: " + err.message;
-    }
-  });
-}
+        const data = await res.json();
 
+        if (!res.ok) {
+          throw new Error(data.message || "Error al iniciar sesión");
+        }
 
+        // Guardar token (y nombre, si viene)
+        localStorage.setItem("token", data.token);
+        if (data.user && data.user.name) {
+          localStorage.setItem("userName", data.user.name);
+        }
 
-// REGISTRO 
-const registerForm = document.getElementById("register-form");
-const msg2 = document.getElementById("msg");
+        if (msg) {
+          msg.textContent = "Login correcto ✔";
+        }
 
-if (registerForm) {
-  registerForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+        // Redirigir al panel
+        window.location.href = "/panel.html";
+      } catch (err) {
+        if (msg) {
+          msg.textContent = "Error: " + err.message;
+        }
+      }
+    });
+  }
 
-    // Datos básicos
-    const name = document.getElementById("name").value;
-    const surname = document.getElementById("surname").value;
-    const birthDate = document.getElementById("birthDate").value;
-    const dni = document.getElementById("dni").value;
-    const country = document.getElementById("country").value;
-    const city = document.getElementById("city").value;
-    const address = document.getElementById("address").value;
-    const postalCode = document.getElementById("postalCode").value;
+  // ========================
+  // REGISTRO
+  // ========================
+  const registerForm = document.getElementById("register-form");
 
-    // Contacto y acceso
-    const email = document.getElementById("email").value;
-    const phone = document.getElementById("phone").value;
-    const password = document.getElementById("password").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
+  if (registerForm) {
+    const msg = document.getElementById("msg");
 
-    // Moneda
-    const mainCurrency = document.getElementById("mainCurrency").value;
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    if (password !== confirmPassword) {
-      msg2.textContent = "Las contraseñas no coinciden";
-      return;
-    }
+      // Datos básicos
+      const name = document.getElementById("name").value.trim();
+      const surname = document.getElementById("surname").value.trim();
+      const birthDate = document.getElementById("birthDate").value;
+      const dni = document.getElementById("dni").value.trim();
+      const country = document.getElementById("country").value.trim();
+      const city = document.getElementById("city").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const postalCode = document.getElementById("postalCode").value.trim();
 
-    try {
-      const res = await fetch("/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          surname,
-          birthDate,
-          dni,
-          country,
-          city,
-          address,
-          postalCode,
-          email,
-          phone,
-          password,
-          mainCurrency,
-        }),
-      });
+      // Contacto y acceso
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword =
+        document.getElementById("confirmPassword").value;
 
-      const data = await res.json();
+      // Moneda
+      const mainCurrency = document.getElementById("mainCurrency").value;
 
-      if (!res.ok) throw new Error(data.message);
+      if (msg) {
+        msg.textContent = "";
+      }
 
-      msg2.textContent = "Registro exitoso ✔ Redirigiendo...";
-      setTimeout(() => {
-        window.location.href = "/login.html";
-      }, 1500);
+      if (password !== confirmPassword) {
+        if (msg) msg.textContent = "Las contraseñas no coinciden";
+        return;
+      }
 
-    } catch (err) {
-      msg2.textContent = "Error: " + err.message;
-    }
-  });
-}
+      try {
+        const res = await fetch("/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            surname,
+            birthDate,
+            dni,
+            country,
+            city,
+            address,
+            postalCode,
+            email,
+            phone,
+            password,
+            mainCurrency,
+          }),
+        });
 
+        const data = await res.json();
 
+        if (!res.ok) {
+          throw new Error(data.message || "Error al registrar");
+        }
 
-// LOGOUT
-const logoutBtn = document.getElementById("logout");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("token");
-    window.location.href = "/";
-  });
-}
+        if (msg) {
+          msg.textContent = "Registro exitoso ✔ Redirigiendo...";
+        }
+
+        setTimeout(() => {
+          window.location.href = "/login.html";
+        }, 1500);
+      } catch (err) {
+        if (msg) {
+          msg.textContent = "Error: " + err.message;
+        }
+      }
+    });
+  }
+
+  // ========================
+  // LOGOUT (en el panel)
+  // ========================
+  const logoutBtn = document.getElementById("logout-btn");
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userName");
+      window.location.href = "/login.html";
+    });
+  }
+});

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Panel | Banco Sánchez</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <header class="brand-header">
+        <img src="/logo sin fondo.png" alt="Banco Sánchez" class="brand-logo" />
+        <h1 class="brand-name">Banco Sánchez</h1>
+      </header>
+
+      <p class="greeting" id="greeting">Hola, usuario 👋</p>
+
+      <main class="card panel-card">
+        <!-- SALDO PRINCIPAL -->
+        <section class="balance-section">
+          <p class="balance-label">Saldo disponible</p>
+          <p class="balance-amount" id="balance-amount">0,00 €</p>
+          <p class="balance-iban" id="balance-iban">ESXX **** **** 0000</p>
+        </section>
+
+        <h1 class="card-title">Mi cuenta</h1>
+
+        <!-- Tarjeta tipo "Mis cuentas" -->
+        <section class="account-widget">
+          <div class="account-widget-header">
+            <div>
+              <p class="widget-title">Mis cuentas</p>
+              <p class="widget-subtitle" id="nombre-cuenta">
+                Cuenta nómina · ESXX **** **** 0000
+              </p>
+            </div>
+
+            <button class="link-btn" id="btn-mostrar-mas">Mostrar más</button>
+          </div>
+
+          <p class="widget-section-title">Últimos movimientos</p>
+
+          <div class="widget-movements" id="lista-movimientos">
+            <p class="no-movements" id="no-movements">
+              Aún no tienes movimientos en esta cuenta.
+            </p>
+          </div>
+        </section>
+
+        <div class="panel-footer">
+          <button class="ghost-btn" id="logout-btn">Cerrar sesión</button>
+        </div>
+      </main>
+    </div>
+
+    <script src="/panel.js"></script>
+  </body>
+</html>
