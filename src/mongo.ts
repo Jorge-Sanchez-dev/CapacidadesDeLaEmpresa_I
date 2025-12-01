@@ -7,7 +7,7 @@ dotenv.config();
 export const connectMongoDB = async () => {
   try {
     const mongoUrl =
-      "mongodb+srv://jsanchezl5:125343Jj@jorge-nebrija.jwrpu.mongodb.net/bancoSanchez?appName=Jorge-Nebrija";
+      process.env.URL_MONGO!;
 
     await mongoose.connect(mongoUrl);
 
