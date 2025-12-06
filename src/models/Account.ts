@@ -13,6 +13,7 @@ export interface IAccount extends Document {
   isMain: boolean;
 }
 
+
 const accountSchema = new Schema<IAccount>(
   {
     owner: {

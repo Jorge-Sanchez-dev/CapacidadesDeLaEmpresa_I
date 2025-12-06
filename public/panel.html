@@ -22,20 +22,51 @@
           <p class="balance-iban" id="balance-iban">ESXX **** **** 0000</p>
         </section>
 
+
+        <section class="transfer-widget">
+  <h2>Hacer transferencia</h2>
+  <form id="transfer-form">
+    <label>
+      IBAN destino
+      <input
+        type="text"
+        id="to-iban"
+        placeholder="ES00 0000 0000 0000 0000 0000"
+        required
+      />
+    </label>
+
+    <label>
+      Cantidad (€)
+      <input
+        type="number"
+        id="amount"
+        step="0.01"
+        min="0.01"
+        required
+      />
+    </label>
+
+    <label>
+      Concepto
+      <input
+        type="text"
+        id="concept"
+        placeholder="Alquiler, regalo..."
+      />
+    </label>
+
+    <button type="submit">Enviar transferencia</button>
+  </form>
+
+  <p id="transfer-message"></p>
+</section>
+
+
         <h1 class="card-title">Mi cuenta</h1>
 
         <!-- Tarjeta tipo "Mis cuentas" -->
         <section class="account-widget">
-          <div class="account-widget-header">
-            <div>
-              <p class="widget-title">Mis cuentas</p>
-              <p class="widget-subtitle" id="nombre-cuenta">
-                Cuenta nómina · ESXX **** **** 0000
-              </p>
-            </div>
-
-            <button class="link-btn" id="btn-mostrar-mas">Mostrar más</button>
-          </div>
 
           <p class="widget-section-title">Últimos movimientos</p>
 

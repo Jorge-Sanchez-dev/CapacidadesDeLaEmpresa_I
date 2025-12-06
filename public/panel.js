@@ -13,15 +13,95 @@ document.addEventListener("DOMContentLoaded", () => {
   const noMovements = document.getElementById("no-movements");
   const balanceAmountEl = document.getElementById("balance-amount");
   const balanceIbanEl = document.getElementById("balance-iban");
-  const greetingEl = document.getElementById("greeting"); // ⭐ AQUI
+  const greetingEl = document.getElementById("greeting");
+  const transferForm = document.getElementById("transfer-form");
+  const transferMsg = document.getElementById("transfer-message");
 
+  // ----- FORMULARIO DE TRANSFERENCIA -----
+  if (transferForm) {
+    transferForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (transferMsg) transferMsg.textContent = "";
+
+      const toIbanInput = document.getElementById("to-iban");
+      const amountInput = document.getElementById("amount");
+      const conceptInput = document.getElementById("concept");
+
+      if (!toIbanInput || !amountInput || !conceptInput) return;
+
+      const toIban = toIbanInput.value.trim();
+      const amount = parseFloat(amountInput.value);
+      const concept = conceptInput.value.trim();
+
+      if (!toIban || isNaN(amount) || amount <= 0) {
+        if (transferMsg) {
+          transferMsg.textContent =
+            "Introduce un IBAN válido y una cantidad positiva.";
+        }
+        return;
+      }
+
+      fetch("/auth/transfer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({ toIban, amount, concept }),
+      })
+        .then(async (res) => {
+          // leemos el cuerpo siempre
+          const data = await res.json().catch(() => null);
+
+          // si el backend responde con error (400/401/404/500...)
+          if (!res.ok) {
+            const msg =
+              (data && data.message) ||
+              "Error al hacer la transferencia";
+            throw new Error(msg);
+          }
+
+          return data;
+        })
+        .then((data) => {
+          if (transferMsg) {
+            transferMsg.textContent = "Transferencia realizada ✅";
+          }
+          // refrescar saldo y movimientos
+          window.location.reload();
+        })
+        .catch((err) => {
+          console.error("Error en /auth/transfer:", err);
+          if (transferMsg) {
+            transferMsg.textContent =
+              err.message || "Error al conectar con el servidor";
+          }
+        });
+    });
+  }
+
+  // ----- CARGA DEL DASHBOARD -----
   fetch("/auth/dashboard", {
     headers: {
       Authorization: "Bearer " + token,
     },
   })
-    .then((res) => res.json())
+    .then(async (res) => {
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        console.error("Error en /auth/dashboard:", data);
+        throw new Error(
+          (data && data.message) ||
+            "No se ha podido cargar el panel"
+        );
+      }
+
+      return data;
+    })
     .then((data) => {
+      if (!data) return;
+
       const { user, account, movements } = data;
 
       // 0) Saludo personalizado
@@ -82,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           const conceptP = document.createElement("p");
           conceptP.classList.add("movement-concept");
-          conceptP.textContent = mov.concept;
+          conceptP.textContent = mov.concept || "Movimiento";
 
           const dateP = document.createElement("p");
           dateP.classList.add("movement-date");
@@ -112,12 +192,15 @@ document.addEventListener("DOMContentLoaded", () => {
           movDiv.appendChild(amountP);
           listaMovimientos.appendChild(movDiv);
         });
+      } else if (noMovements) {
+        noMovements.style.display = "block";
       }
     })
     .catch((err) => {
       console.error("Error cargando dashboard:", err);
     });
 
+  // ----- LOGOUT -----
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
@@ -131,7 +214,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function formatearIban(iban) {
   if (!iban) return "";
-  return iban.replace(/\s+/g, "").replace(/(.{4})/g, "$1 ").trim();
+  return iban
+    .replace(/\s+/g, "")
+    .replace(/(.{4})/g, "$1 ")
+    .trim();
 }
 
 function formatearFecha(fechaStr) {

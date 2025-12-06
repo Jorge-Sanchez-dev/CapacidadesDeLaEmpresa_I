@@ -7,9 +7,6 @@ import { Request, Response } from "express";
 import Transfer from "../models/Transfer";
 import { verifyToken } from "../middleware/verifyToken"; // si usas ese tipo
 
-
-
-
 const JWT_SECRET = process.env.JWT_SECRET as string; // asegúrate de tenerlo en .env
 
 if (!JWT_SECRET) {
@@ -58,10 +55,11 @@ export const register = async (req: Request, res: Response) => {
     const timestamp = Date.now().toString().slice(-10);
     const fakeAccountNumber = "0000" + timestamp; // 14 dígitos aprox
     const fakeIban = `ES12 1111 2222 ${timestamp.slice(-4)}`;
+    const normalizedIban = fakeIban.replace(/\s+/g, ""); // 👈 ELIMINA ESPACIOS
 
     await Account.create({
       owner: user._id,
-      iban: fakeIban,
+      iban: normalizedIban, // 👈 SE GUARDA NORMALIZADO
       accountNumber: fakeAccountNumber,
       currency: mainCurrency,
       balance: 0,
@@ -76,12 +74,9 @@ export const register = async (req: Request, res: Response) => {
       .json({ message: "Usuario y cuenta creados correctamente" });
   } catch (err) {
     console.error("Error en register:", err);
-    return res
-      .status(500)
-      .json({ message: "Error en el servidor" });
+    return res.status(500).json({ message: "Error en el servidor" });
   }
 };
-
 
 // LOGIN
 export const login = async (req: Request, res: Response) => {
@@ -97,23 +92,17 @@ export const login = async (req: Request, res: Response) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res
-        .status(400)
-        .json({ message: "Usuario no existe" });
+      return res.status(400).json({ message: "Usuario no existe" });
     }
 
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) {
-      return res
-        .status(400)
-        .json({ message: "Contraseña incorrecta" });
+      return res.status(400).json({ message: "Contraseña incorrecta" });
     }
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     // devolvemos también datos básicos para el front
     const safeUser = {
@@ -127,9 +116,7 @@ export const login = async (req: Request, res: Response) => {
     return res.json({ token, user: safeUser });
   } catch (err) {
     console.error("Error en login:", err);
-    return res
-      .status(500)
-      .json({ message: "Error en el servidor" });
+    return res.status(500).json({ message: "Error en el servidor" });
   }
 };
 
@@ -162,21 +149,22 @@ export const dashboard = async (req: any, res: Response) => {
 
     if (!mainAccount) {
       return res.json({
+        user: req.user,
         account: null,
         movements: [],
       });
     }
 
-    // 2) Obtenemos los últimos movimientos de esa cuenta (si existen)
+    // 2) Obtenemos los últimos movimientos (entradas y salidas)
     const transfers = await Transfer.find({
-      fromAccount: mainAccount._id,
       status: "completed",
+      $or: [{ fromAccount: mainAccount._id }, { toAccount: mainAccount._id }],
     })
       .sort({ date: -1 })
-      .limit(5)
+      .limit(10)
       .lean();
 
-    // 3) Damos forma a lo que queremos enviar al front
+    // 3) Preparamos lo que se mandará al front
     const accountSummary = {
       alias: mainAccount.alias || "Cuenta principal",
       iban: mainAccount.iban,
@@ -184,25 +172,124 @@ export const dashboard = async (req: any, res: Response) => {
       currency: mainAccount.currency,
     };
 
-    const movements = transfers.map((t) => ({
-      id: t._id,
-      concept: t.concept,
-      date: t.date,
-      amount: t.amount,
-      direction: t.direction, // "IN" | "OUT"
-    }));
+    const movements = transfers.map((t) => {
+      const isOutgoing =
+        t.fromAccount.toString() === mainAccount._id.toString();
 
+      return {
+        id: t._id,
+        concept: t.concept,
+        date: t.date,
+        amount: t.amount,
+        direction: isOutgoing ? "OUT" : "IN",
+      };
+    });
+
+    // 4) 🚀🚀🚀 AQUÍ ESTABA LO QUE TE FALTABA
     return res.json({
-  user: {
-    name: req.user.name,
-    surname: req.user.surname,
-  },
-  account: accountSummary,
-  movements,
-});
-
+      user: req.user,
+      account: accountSummary,
+      movements,
+    });
   } catch (err) {
     console.error("Error en dashboard:", err);
+    return res.status(500).json({ message: "Error en el servidor" });
+  }
+};
+
+// TRANSFERENCIA por IBAN
+export const transfer = async (req: any, res: Response) => {
+  try {
+    const user = req.user; // viene de verifyToken
+    if (!user) {
+      return res.status(401).json({ message: "No autenticado" });
+    }
+
+    const { toIban, amount, concept } = req.body;
+
+    if (!toIban || !amount) {
+      return res
+        .status(400)
+        .json({ message: "IBAN destino y cantidad son obligatorios" });
+    }
+
+    const numericAmount = Number(amount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      return res
+        .status(400)
+        .json({ message: "La cantidad debe ser un número positivo" });
+    }
+
+    // 1) Cuenta origen = cuenta principal del usuario
+    const fromAccount = await Account.findOne({
+      owner: user._id,
+      isMain: true,
+      status: "active",
+    });
+
+    if (!fromAccount) {
+      return res
+        .status(400)
+        .json({ message: "No se ha encontrado la cuenta de origen" });
+    }
+
+    if (fromAccount.balance < numericAmount) {
+      return res
+        .status(400)
+        .json({ message: "Saldo insuficiente en la cuenta de origen" });
+    }
+
+    // 2) Cuenta destino por IBAN
+    const toAccount = await Account.findOne({
+      iban: toIban.replace(/\s+/g, ""),
+      status: "active",
+    });
+
+    if (!toAccount) {
+      return res
+        .status(404)
+        .json({ message: "No se ha encontrado la cuenta destino" });
+    }
+
+    // Opcional: evitar transferirse a sí mismo
+    if (toAccount._id.toString() === fromAccount._id.toString()) {
+      return res
+        .status(400)
+        .json({ message: "La cuenta destino no puede ser la misma" });
+    }
+
+    // 3) Actualizar saldos
+    fromAccount.balance -= numericAmount;
+    toAccount.balance += numericAmount;
+
+    await fromAccount.save();
+    await toAccount.save();
+
+    // 4) Crear registro de transferencia
+    const destUser = await User.findById(toAccount.owner).lean();
+    const counterpartName = destUser
+      ? `${destUser.name} ${destUser.surname}`.trim()
+      : undefined;
+
+    const transfer = await Transfer.create({
+      fromAccount: fromAccount._id,
+      toAccount: toAccount._id,
+      amount: numericAmount,
+      currency: fromAccount.currency,
+      concept: concept || "Transferencia bancaria",
+      date: new Date(),
+      status: "completed",
+      direction: "OUT", // desde el punto de vista de la cuenta origen
+      counterpartName,
+      counterpartIban: toAccount.iban,
+    });
+
+    return res.json({
+      message: "Transferencia realizada correctamente",
+      transfer,
+    });
+  } catch (err) {
+    console.error("Error en transfer:", err);
     return res.status(500).json({ message: "Error en el servidor" });
   }
 };
