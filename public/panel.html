@@ -6,82 +6,56 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <div class="page-wrapper">
-      <header class="brand-header">
-        <img src="/logo sin fondo.png" alt="Banco Sánchez" class="brand-logo" />
-        <h1 class="brand-name">Banco Sánchez</h1>
-      </header>
+    <div class="layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <h2 class="sidebar-title">Banco Sánchez</h2>
 
-      <p class="greeting" id="greeting">Hola, usuario 👋</p>
+        <nav class="sidebar-nav">
+          <a href="/panel.html" class="sidebar-item">🏠 Inicio</a>
+          <a href="/registroPanel.html" class="sidebar-item active"
+            >💸 Hacer transferencia</a
+          >
+        </nav>
 
-      <main class="card panel-card">
-        <!-- SALDO PRINCIPAL -->
-        <section class="balance-section">
-          <p class="balance-label">Saldo disponible</p>
-          <p class="balance-amount" id="balance-amount">0,00 €</p>
-          <p class="balance-iban" id="balance-iban">ESXX **** **** 0000</p>
-        </section>
+        <button id="logout-btn" class="sidebar-logout">Cerrar sesión</button>
+      </aside>
 
-        <section class="transfer-section">
-          <div class="transfer-header">
-            <h2>Hacer transferencia</h2>
-            <p>Envía dinero a otra cuenta usando su IBAN.</p>
+      <!-- PANEL PRINCIPAL -->
+      <main class="main-panel">
+        <!-- conservamos TODO lo que ya tenías -->
+        <div class="page-wrapper">
+          <header class="brand-header">
+            <img
+              src="/logo sin fondo.png"
+              alt="Banco Sánchez"
+              class="brand-logo"
+            />
+            <h1 class="brand-name">Banco Sánchez</h1>
+          </header>
+
+          <p class="greeting" id="greeting">Hola, usuario 👋</p>
+
+          <!-- 💰 tu panel-card original -->
+          <div class="card panel-card">
+            <section class="balance-section">
+              <p class="balance-label">Saldo disponible</p>
+              <p class="balance-amount" id="balance-amount">0,00 €</p>
+              <p class="balance-iban" id="balance-iban">ESXX **** **** 0000</p>
+            </section>
+
+            <h1 class="card-title">Mi cuenta</h1>
+
+            <section class="account-widget">
+              <p class="widget-section-title">Últimos movimientos</p>
+
+              <div class="widget-movements" id="lista-movimientos">
+                <p class="no-movements" id="no-movements">
+                  Aún no tienes movimientos en esta cuenta.
+                </p>
+              </div>
+            </section>
           </div>
-
-          <form id="transfer-form" class="transfer-form">
-            <div class="transfer-field">
-              <label for="to-iban">IBAN destino</label>
-              <input
-                type="text"
-                id="to-iban"
-                placeholder="ES00 0000 0000 0000 0000 0000"
-                required
-              />
-            </div>
-
-            <div class="transfer-field">
-              <label for="amount">Cantidad (€)</label>
-              <input
-                type="number"
-                id="amount"
-                step="0.01"
-                min="0.01"
-                required
-              />
-            </div>
-
-            <div class="transfer-field">
-              <label for="concept">Concepto</label>
-              <input
-                type="text"
-                id="concept"
-                placeholder="Alquiler, regalo..."
-              />
-            </div>
-
-            <button type="submit" class="primary-btn small-btn">
-              Enviar transferencia
-            </button>
-          </form>
-
-          <p id="transfer-message" class="transfer-message"></p>
-        </section>
-
-        <h1 class="card-title">Mi cuenta</h1>
-
-        <!-- Tarjeta tipo "Mis cuentas" -->
-        <section class="account-widget">
-          <p class="widget-section-title">Últimos movimientos</p>
-
-          <div class="widget-movements" id="lista-movimientos">
-            <p class="no-movements" id="no-movements">
-              Aún no tienes movimientos en esta cuenta.
-            </p>
-          </div>
-        </section>
-
-        <div class="panel-footer">
-          <button class="ghost-btn" id="logout-btn">Cerrar sesión</button>
         </div>
       </main>
     </div>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Transferencia | Banco Sánchez</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+
+  <body>
+    <div class="layout">
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <h2 class="sidebar-title">Banco Sánchez</h2>
+        <nav class="sidebar-nav">
+          <a href="/panel.html" class="sidebar-item">🏠 Inicio</a>
+          <a href="/registroPanel.html" class="sidebar-item active">💸 Hacer transferencia</a>
+        </nav>
+
+        <button id="logout-btn" class="sidebar-logout">Cerrar sesión</button>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="main-panel">
+        <div class="page-wrapper">
+
+          <header class="brand-header">
+            <img src="/logo sin fondo.png" alt="Banco Sánchez" class="brand-logo" />
+            <h1 class="brand-name">Banco Sánchez</h1>
+          </header>
+
+          <p class="greeting" id="greeting">Hola, usuario 👋</p>
+
+          <!-- TARJETA SOLO DE TRANSFERENCIA -->
+          <div class="card panel-card">
+
+            <section class="transfer-section">
+              <h2>Hacer transferencia</h2>
+
+              <form id="transfer-form" class="transfer-form">
+                <div class="transfer-field">
+                  <label for="to-iban">IBAN destino</label>
+                  <input
+                    type="text"
+                    id="to-iban"
+                    placeholder="ES00 0000 0000 0000..."
+                    required
+                  />
+                </div>
+
+                <div class="transfer-field">
+                  <label for="amount">Cantidad (€)</label>
+                  <input
+                    type="number"
+                    id="amount"
+                    step="0.01"
+                    min="0.01"
+                    required
+                  />
+                </div>
+
+                <div class="transfer-field">
+                  <label for="concept">Concepto</label>
+                  <input
+                    type="text"
+                    id="concept"
+                    placeholder="Alquiler, regalo..."
+                  />
+                </div>
+
+                <button type="submit" class="primary-btn small-btn">
+                  Enviar transferencia
+                </button>
+              </form>
+
+              <p id="transfer-message" class="transfer-message"></p>
+            </section>
+          </div>
+
+        </div>
+      </main>
+    </div>
+
+    <script src="/panel.js"></script>
+  </body>
+</html>
