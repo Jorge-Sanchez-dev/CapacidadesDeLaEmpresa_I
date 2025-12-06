@@ -22,52 +22,55 @@
           <p class="balance-iban" id="balance-iban">ESXX **** **** 0000</p>
         </section>
 
+        <section class="transfer-section">
+          <div class="transfer-header">
+            <h2>Hacer transferencia</h2>
+            <p>Envía dinero a otra cuenta usando su IBAN.</p>
+          </div>
 
-        <section class="transfer-widget">
-  <h2>Hacer transferencia</h2>
-  <form id="transfer-form">
-    <label>
-      IBAN destino
-      <input
-        type="text"
-        id="to-iban"
-        placeholder="ES00 0000 0000 0000 0000 0000"
-        required
-      />
-    </label>
+          <form id="transfer-form" class="transfer-form">
+            <div class="transfer-field">
+              <label for="to-iban">IBAN destino</label>
+              <input
+                type="text"
+                id="to-iban"
+                placeholder="ES00 0000 0000 0000 0000 0000"
+                required
+              />
+            </div>
 
-    <label>
-      Cantidad (€)
-      <input
-        type="number"
-        id="amount"
-        step="0.01"
-        min="0.01"
-        required
-      />
-    </label>
+            <div class="transfer-field">
+              <label for="amount">Cantidad (€)</label>
+              <input
+                type="number"
+                id="amount"
+                step="0.01"
+                min="0.01"
+                required
+              />
+            </div>
 
-    <label>
-      Concepto
-      <input
-        type="text"
-        id="concept"
-        placeholder="Alquiler, regalo..."
-      />
-    </label>
+            <div class="transfer-field">
+              <label for="concept">Concepto</label>
+              <input
+                type="text"
+                id="concept"
+                placeholder="Alquiler, regalo..."
+              />
+            </div>
 
-    <button type="submit">Enviar transferencia</button>
-  </form>
+            <button type="submit" class="primary-btn small-btn">
+              Enviar transferencia
+            </button>
+          </form>
 
-  <p id="transfer-message"></p>
-</section>
-
+          <p id="transfer-message" class="transfer-message"></p>
+        </section>
 
         <h1 class="card-title">Mi cuenta</h1>
 
         <!-- Tarjeta tipo "Mis cuentas" -->
         <section class="account-widget">
-
           <p class="widget-section-title">Últimos movimientos</p>
 
           <div class="widget-movements" id="lista-movimientos">

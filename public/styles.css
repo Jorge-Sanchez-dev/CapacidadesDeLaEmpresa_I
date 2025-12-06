@@ -591,3 +591,81 @@ body {
   margin-bottom: 1rem;
   font-weight: 600;
 }
+
+
+/* ===================== Sección de transferencia ===================== */
+
+.transfer-section {
+  margin: 0 0 2rem;
+  padding: 1.5rem 1.75rem;
+  border-radius: 20px;
+  background: radial-gradient(circle at top left, #111827 0, #020617 70%);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.transfer-header h2 {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.transfer-header p {
+  margin: 0.25rem 0 1rem;
+  font-size: 0.9rem;
+  color: #9bb4d0;
+}
+
+/* Grid del formulario */
+.transfer-form {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) minmax(0, 1.6fr) auto;
+  gap: 0.75rem 1rem;
+  align-items: end;
+}
+
+.transfer-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.transfer-field label {
+  color: #cbd5e1;
+}
+
+.transfer-field input {
+  border-radius: 999px;
+  border: 1px solid #1f2937;
+  background: #020617;
+  padding: 0.6rem 0.9rem;
+  color: #f9fafb;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.transfer-field input::placeholder {
+  color: #6b7280;
+}
+
+.transfer-field input:focus {
+  border-color: #3b82f6;
+}
+
+/* Mensaje de error/éxito */
+.transfer-message {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  min-height: 1em;
+  color: #e5e7eb;
+}
+
+/* Responsive: una columna en móviles */
+@media (max-width: 768px) {
+  .transfer-form {
+    grid-template-columns: 1fr;
+  }
+
+  .transfer-section {
+    padding: 1.25rem;
+  }
+}
