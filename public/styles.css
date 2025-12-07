@@ -745,3 +745,31 @@ body {
   overflow-y: auto;
   padding: 2rem;
 }
+
+/* ======== PANELES ======== */
+
+/* Tarjeta normal (Inicio) */
+.panel-card {
+  max-width: 520px;             /* ancho estrecho tipo tarjeta */
+  margin: 2.5rem auto 0;        /* centrada en la pantalla */
+}
+
+/* Tarjeta ancha (Transferencias) */
+.panel-card--wide {
+  max-width: 1100px;            /* ocupa mucho más ancho */
+  margin: 2.5rem auto 0;        /* alineación igual */
+}
+
+/* Layout general */
+.layout {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Panel principal */
+.main-panel {
+  flex: 1;                     /* ← PROBLEMA PRINCIPAL SOLUCIONADO */
+  padding: 2rem;
+  overflow-y: auto;
+}
