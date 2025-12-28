@@ -5,29 +5,18 @@
     <title>Panel | Banco Sánchez</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
+
   <body>
     <div class="layout">
-      <!-- SIDEBAR -->
-      <aside class="sidebar">
-        <h2 class="sidebar-title">Banco Sánchez</h2>
-
-        <nav class="sidebar-nav">
-          <a href="/panel.html" class="sidebar-item active">🏠 Inicio</a>
-          <a href="/registroPanel.html" class="sidebar-item"
-            >💸 Hacer transferencia</a
-          >
-        </nav>
-
-        <button id="logout-btn" class="sidebar-logout">Cerrar sesión</button>
-      </aside>
+      <!-- SIDEBAR (se carga por JS) -->
+      <div id="sidebar-container"></div>
 
       <!-- PANEL PRINCIPAL -->
       <main class="main-panel">
-        <!-- conservamos TODO lo que ya tenías -->
         <div class="page-wrapper">
           <header class="brand-header">
             <img
-              src="/logo sin fondo.png"
+              src="/photos/logo%20sin%20fondo.png"
               alt="Banco Sánchez"
               class="brand-logo"
             />
@@ -36,7 +25,6 @@
 
           <p class="greeting" id="greeting">Hola, usuario 👋</p>
 
-          <!-- 💰 tu panel-card original -->
           <div class="card panel-card">
             <section class="balance-section">
               <p class="balance-label">Saldo disponible</p>
@@ -58,8 +46,43 @@
           </div>
         </div>
       </main>
+
+      <!-- ANUNCIOS DERECHA -->
+      <aside class="right-rail">
+        <div class="rail-title">Para ti</div>
+
+        <!-- Banner 1: imagen en círculo -->
+        <a class="ad-banner ad-banner--circle" href="#">
+          <div class="ad-banner__content">
+            <div class="ad-banner__kpi">+11.000 cajeros disponibles</div>
+            <div class="ad-banner__text">
+              Descubre todo lo que puedes hacer con Banco Sánchez.
+            </div>
+          </div>
+
+          <div class="ad-banner__media">
+            <img src="/photos/Cajero.png" alt="Cajero" />
+          </div>
+        </a>
+
+        <!-- Banner 2: imagen rectangular -->
+        <a class="ad-banner" href="#">
+          <div class="ad-banner__content">
+            <div class="ad-banner__title">Sánchez Shop</div>
+            <div class="ad-banner__text">Descuentos en tecnología y gaming</div>
+          </div>
+
+          <div class="ad-banner__media">
+            <img src="/photos/Tecnologia.png" alt="Sánchez Shop" />
+          </div>
+        </a>
+      </aside>
     </div>
 
+    <!-- Carga el sidebar reutilizable -->
+    <script src="/js/loadSidebar.js"></script>
+
+    <!-- Tu lógica del panel -->
     <script src="/panel.js"></script>
   </body>
 </html>

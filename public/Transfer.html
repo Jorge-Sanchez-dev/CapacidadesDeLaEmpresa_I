@@ -8,24 +8,18 @@
 
   <body>
     <div class="layout">
-
-      <!-- SIDEBAR -->
-      <aside class="sidebar">
-        <h2 class="sidebar-title">Banco Sánchez</h2>
-        <nav class="sidebar-nav">
-          <a href="/panel.html" class="sidebar-item">🏠 Inicio</a>
-          <a href="/registroPanel.html" class="sidebar-item active">💸 Hacer transferencia</a>
-        </nav>
-
-        <button id="logout-btn" class="sidebar-logout">Cerrar sesión</button>
-      </aside>
+      <!-- SIDEBAR (se carga por JS) -->
+      <div id="sidebar-container"></div>
 
       <!-- MAIN -->
       <main class="main-panel">
         <div class="page-wrapper">
-
           <header class="brand-header">
-            <img src="/logo sin fondo.png" alt="Banco Sánchez" class="brand-logo" />
+            <img
+              src="/photos/logo%20sin%20fondo.png"
+              alt="Banco Sánchez"
+              class="brand-logo"
+            />
             <h1 class="brand-name">Banco Sánchez</h1>
           </header>
 
@@ -33,7 +27,6 @@
 
           <!-- TARJETA SOLO DE TRANSFERENCIA -->
           <div class="card panel-card panel-card--wide">
-
             <section class="transfer-section">
               <h2>Hacer transferencia</h2>
 
@@ -76,11 +69,22 @@
               <p id="transfer-message" class="transfer-message"></p>
             </section>
           </div>
-
         </div>
       </main>
+
+      <!-- (Opcional) ANUNCIOS DERECHA: si quieres también en esta página -->
+      <!--
+      <aside class="right-rail">
+        <div class="rail-title">Para ti</div>
+        ...
+      </aside>
+      -->
     </div>
 
-    <script src="/panel.js"></script>
+    <!-- Carga el sidebar reutilizable -->
+    <script src="/js/loadSidebar.js"></script>
+
+    <!-- JS de esta página (recomendado) -->
+    <script src="/transfer.js"></script>
   </body>
 </html>
