@@ -47,42 +47,17 @@
         </div>
       </main>
 
-      <!-- ANUNCIOS DERECHA -->
-      <aside class="right-rail">
-        <div class="rail-title">Para ti</div>
-
-        <!-- Banner 1: imagen en círculo -->
-        <a class="ad-banner ad-banner--circle" href="#">
-          <div class="ad-banner__content">
-            <div class="ad-banner__kpi">+11.000 cajeros disponibles</div>
-            <div class="ad-banner__text">
-              Descubre todo lo que puedes hacer con Banco Sánchez.
-            </div>
-          </div>
-
-          <div class="ad-banner__media">
-            <img src="/photos/Cajero.png" alt="Cajero" />
-          </div>
-        </a>
-
-        <!-- Banner 2: imagen rectangular -->
-        <a class="ad-banner" href="#">
-          <div class="ad-banner__content">
-            <div class="ad-banner__title">Sánchez Shop</div>
-            <div class="ad-banner__text">Descuentos en tecnología y gaming</div>
-          </div>
-
-          <div class="ad-banner__media">
-            <img src="/photos/Tecnologia.png" alt="Sánchez Shop" />
-          </div>
-        </a>
-      </aside>
+      <!-- ANUNCIOS DERECHA (reutilizables) -->
+      <div id="right-rail-container"></div>
     </div>
 
-    <!-- Carga el sidebar reutilizable -->
+    <!-- Sidebar reutilizable -->
     <script src="/js/loadSidebar.js"></script>
 
-    <!-- Tu lógica del panel -->
+    <!-- Anuncios reutilizables -->
+    <script src="/js/loadRightRail.js"></script>
+
+    <!-- Lógica del panel -->
     <script src="/panel.js"></script>
   </body>
 </html>

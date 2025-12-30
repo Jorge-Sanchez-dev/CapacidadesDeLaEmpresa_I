@@ -2,19 +2,19 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>SECCIÓN | Banco Sánchez</title>
+    <title>Préstamos | Banco Sánchez</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
 
   <body>
     <div class="layout">
-      <!-- SIDEBAR (reutilizable) -->
+      <!-- SIDEBAR -->
       <div id="sidebar-container"></div>
 
       <!-- MAIN -->
       <main class="main-panel">
         <div class="page-wrapper">
-          <!-- LOGO -->
+          <!-- BRAND -->
           <header class="brand-header">
             <img
               src="/photos/logo%20sin%20fondo.png"
@@ -29,35 +29,250 @@
             Hola, <span id="user-name">usuario</span> 👋
           </p>
 
-          <!-- CARD CENTRAL -->
+          <!-- CARD PRINCIPAL -->
           <div class="card panel-card panel-card--wide">
-            <h2 class="card-title">TÍTULO DE LA SECCIÓN</h2>
+            <h2 class="card-title">Préstamos</h2>
             <p class="card-subtitle">
-              Esta sección estará disponible próximamente.
+              Simula, solicita y consulta tus préstamos desde un solo lugar.
             </p>
 
+            <!-- GRID: resumen + acciones -->
             <div
-              style="
-                margin-top: 2rem;
-                text-align: center;
-                font-size: 1.1rem;
-                opacity: 0.8;
-              "
+              class="panel-grid"
+              style="grid-template-columns: 1.2fr 1fr; margin-top: 24px;"
             >
-              🚧 En construcción
+              <!-- RESUMEN -->
+              <section class="info-card">
+                <h2>Resumen</h2>
+
+                <div class="info-line">
+                  <span>Límite preaprobado</span>
+                  <span class="info-value" id="limit-amount">5.000 €</span>
+                </div>
+                <div class="info-line">
+                  <span>Disponible</span>
+                  <span class="info-value" id="available-amount">3.750 €</span>
+                </div>
+                <div class="info-line">
+                  <span>Estado</span>
+                  <span class="info-value" id="loan-status">Preaprobado</span>
+                </div>
+
+                <button class="primary-btn small-btn" id="open-apply">
+                  Solicitar préstamo
+                </button>
+
+                <button
+                  class="ghost-btn"
+                  id="view-conditions"
+                  style="margin-top: 10px;"
+                >
+                  Ver condiciones
+                </button>
+              </section>
+
+              <!-- ACCESOS RÁPIDOS -->
+              <section class="info-card">
+                <h2>Accesos rápidos</h2>
+
+                <div class="info-line">
+                  <span>Cuota estimada</span>
+                  <span class="info-value" id="quick-fee">—</span>
+                </div>
+                <div class="info-line">
+                  <span>Coste total</span>
+                  <span class="info-value" id="quick-total">—</span>
+                </div>
+
+                <div
+                  style="
+                    margin-top: 12px;
+                    opacity: 0.85;
+                    font-size: 0.9rem;
+                  "
+                >
+                  Usa el simulador de abajo para calcular tu cuota en segundos.
+                </div>
+              </section>
             </div>
+
+            <!-- SIMULADOR -->
+            <section class="transfer-section" style="margin-top: 24px;">
+              <div class="transfer-header">
+                <h2>Simulador rápido</h2>
+                <p>Calcula cuota mensual y coste total (estimación).</p>
+              </div>
+
+              <form
+                id="loan-sim-form"
+                class="transfer-form"
+                style="
+                  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr)
+                    minmax(0, 1fr) auto;
+                "
+              >
+                <div class="transfer-field">
+                  <label for="loan-amount">Importe (€)</label>
+                  <input
+                    type="number"
+                    id="loan-amount"
+                    min="100"
+                    step="50"
+                    placeholder="3000"
+                    required
+                  />
+                </div>
+
+                <div class="transfer-field">
+                  <label for="loan-months">Plazo (meses)</label>
+                  <input
+                    type="number"
+                    id="loan-months"
+                    min="3"
+                    max="120"
+                    step="1"
+                    placeholder="24"
+                    required
+                  />
+                </div>
+
+                <div class="transfer-field">
+                  <label for="loan-apr">Interés (TIN %)</label>
+                  <input
+                    type="number"
+                    id="loan-apr"
+                    min="0"
+                    max="30"
+                    step="0.1"
+                    placeholder="6.5"
+                    required
+                  />
+                </div>
+
+                <button type="submit" class="primary-btn small-btn">
+                  Calcular
+                </button>
+              </form>
+
+              <p id="loan-message" class="transfer-message"></p>
+
+              <!-- RESULTADOS -->
+              <div
+                class="panel-grid"
+                style="grid-template-columns: 1fr 1fr; margin-top: 16px;"
+              >
+                <div class="info-card">
+                  <h2>Resultado</h2>
+
+                  <div class="info-line">
+                    <span>Cuota mensual</span>
+                    <span class="info-value" id="result-fee">—</span>
+                  </div>
+                  <div class="info-line">
+                    <span>Intereses totales</span>
+                    <span class="info-value" id="result-interest">—</span>
+                  </div>
+                  <div class="info-line">
+                    <span>Coste total</span>
+                    <span class="info-value" id="result-total">—</span>
+                  </div>
+                </div>
+
+                <div class="info-card">
+                  <h2>Recomendación</h2>
+                  <div
+                    style="
+                      opacity: 0.85;
+                      font-size: 0.95rem;
+                      line-height: 1.35;
+                    "
+                  >
+                    Para una cuota cómoda, intenta que no supere el
+                    <b>30%</b> de tus ingresos mensuales.
+                    (Consejo amistoso, no magia financiera 😄)
+                  </div>
+
+                  <button
+                    class="ghost-btn"
+                    id="copy-simulation"
+                    style="margin-top: 14px;"
+                  >
+                    Copiar simulación
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <!-- PRÉSTAMOS ACTIVOS -->
+            <section class="transfer-section" style="margin-top: 18px;">
+              <div class="transfer-header">
+                <h2>Préstamos activos</h2>
+                <p>Listado base (luego lo conectas al backend).</p>
+              </div>
+
+              <div
+                class="movements-list"
+                id="loans-list"
+                style="max-height: 220px;"
+              >
+                <div class="movement">
+                  <div>
+                    <p class="movement-concept">
+                      <b>Préstamo personal</b> · Reforma
+                    </p>
+                    <p class="movement-date">
+                      Inicio: 2025-10-01 · Plazo: 24 meses
+                    </p>
+                  </div>
+                  <div style="text-align: right;">
+                    <div class="movement-amount">125,40 €/mes</div>
+                    <div class="movement-date">Pendiente: 2.610,00 €</div>
+                  </div>
+                </div>
+
+                <div class="movement">
+                  <div>
+                    <p class="movement-concept">
+                      <b>Préstamo rápido</b> · Portátil
+                    </p>
+                    <p class="movement-date">
+                      Inicio: 2025-06-15 · Plazo: 12 meses
+                    </p>
+                  </div>
+                  <div style="text-align: right;">
+                    <div class="movement-amount">89,10 €/mes</div>
+                    <div class="movement-date">Pendiente: 420,00 €</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel-footer">
+                <button class="ghost-btn" id="download-contract">
+                  Descargar contrato (demo)
+                </button>
+              </div>
+            </section>
           </div>
         </div>
       </main>
+
+      <!-- ANUNCIOS DERECHA (reutilizables) -->
+      <div id="right-rail-container"></div>
     </div>
 
     <!-- Sidebar -->
     <script src="/js/loadSidebar.js"></script>
 
-    <!-- Nombre del usuario (base) -->
+    <!-- Anuncios reutilizables -->
+    <script src="/js/loadRightRail.js"></script>
+
+    <!-- JS de esta página -->
+    <script src="/prestamos.js"></script>
+
+    <!-- Nombre del usuario -->
     <script>
-      // Base sencilla: luego lo conectas a tu backend
-      document.getElementById("user-name").textContent = "Jorge";
+      const stored = localStorage.getItem("userName");
+      document.getElementById("user-name").textContent = stored || "Jorge";
     </script>
   </body>
 </html>

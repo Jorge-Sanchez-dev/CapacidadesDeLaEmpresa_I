@@ -2,19 +2,19 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>SECCIÓN | Banco Sánchez</title>
+    <title>Simulador Hipoteca | Banco Sánchez</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
 
   <body>
     <div class="layout">
-      <!-- SIDEBAR (reutilizable) -->
+      <!-- SIDEBAR -->
       <div id="sidebar-container"></div>
 
       <!-- MAIN -->
       <main class="main-panel">
         <div class="page-wrapper">
-          <!-- LOGO -->
+          <!-- BRAND -->
           <header class="brand-header">
             <img
               src="/photos/logo%20sin%20fondo.png"
@@ -29,35 +29,236 @@
             Hola, <span id="user-name">usuario</span> 👋
           </p>
 
-          <!-- CARD CENTRAL -->
+          <!-- CARD PRINCIPAL -->
           <div class="card panel-card panel-card--wide">
-            <h2 class="card-title">TÍTULO DE LA SECCIÓN</h2>
+            <h2 class="card-title">Simulador de hipoteca</h2>
             <p class="card-subtitle">
-              Esta sección estará disponible próximamente.
+              Calcula tu cuota mensual, intereses y coste total (estimación).
             </p>
 
+            <!-- RESUMEN + CONSEJOS -->
+            <div
+              class="panel-grid"
+              style="grid-template-columns: 1.15fr 1fr; margin-top: 24px;"
+            >
+              <section class="info-card">
+                <h2>Resumen rápido</h2>
+
+                <div class="info-line">
+                  <span>LTV (financiación)</span>
+                  <span class="info-value" id="ltv">—</span>
+                </div>
+                <div class="info-line">
+                  <span>Entrada estimada</span>
+                  <span class="info-value" id="downpayment">—</span>
+                </div>
+                <div class="info-line">
+                  <span>Importe a financiar</span>
+                  <span class="info-value" id="loan">—</span>
+                </div>
+
+                <button class="ghost-btn" id="reset" style="margin-top: 12px;">
+                  Reiniciar
+                </button>
+              </section>
+
+              <section class="info-card">
+                <h2>Consejo</h2>
+                <div
+                  style="
+                    opacity: 0.85;
+                    font-size: 0.95rem;
+                    line-height: 1.35;
+                  "
+                >
+                  Intenta que la cuota no supere el <b>30%</b> de tus ingresos
+                  mensuales. Y que tu “entrada” no sea un “me lo invento” 😄
+                </div>
+
+                <button
+                  class="primary-btn small-btn"
+                  id="save-sim"
+                  style="margin-top: 14px;"
+                >
+                  Guardar simulación
+                </button>
+              </section>
+            </div>
+
+            <!-- SIMULADOR -->
+            <section class="transfer-section" style="margin-top: 24px;">
+              <div class="transfer-header">
+                <h2>Datos de la vivienda</h2>
+                <p>Rellena los datos para calcular la cuota.</p>
+              </div>
+
+              <form
+                id="mortgage-form"
+                class="transfer-form"
+                style="
+                  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr)
+                    minmax(0, 1fr) auto;
+                "
+              >
+                <div class="transfer-field">
+                  <label for="price">Precio vivienda (€)</label>
+                  <input
+                    type="number"
+                    id="price"
+                    min="30000"
+                    step="1000"
+                    placeholder="200000"
+                    required
+                  />
+                </div>
+
+                <div class="transfer-field">
+                  <label for="down">Entrada (€)</label>
+                  <input
+                    type="number"
+                    id="down"
+                    min="0"
+                    step="500"
+                    placeholder="40000"
+                    required
+                  />
+                </div>
+
+                <div class="transfer-field">
+                  <label for="years">Plazo (años)</label>
+                  <input
+                    type="number"
+                    id="years"
+                    min="5"
+                    max="40"
+                    step="1"
+                    placeholder="30"
+                    required
+                  />
+                </div>
+
+                <button type="submit" class="primary-btn small-btn">
+                  Calcular
+                </button>
+
+                <div class="transfer-field">
+                  <label for="rate">Interés (TIN %)</label>
+                  <input
+                    type="number"
+                    id="rate"
+                    min="0"
+                    max="15"
+                    step="0.1"
+                    placeholder="3.2"
+                    required
+                  />
+                </div>
+
+                <div class="transfer-field">
+                  <label for="type">Tipo</label>
+                  <div class="select-wrapper">
+                    <select id="type">
+                      <option value="fixed" selected>Fija</option>
+                      <option value="variable">Variable (estimación)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="transfer-field">
+                  <label for="income">Ingresos mensuales (€)</label>
+                  <input
+                    type="number"
+                    id="income"
+                    min="0"
+                    step="50"
+                    placeholder="2000"
+                  />
+                </div>
+              </form>
+
+              <p id="mortgage-message" class="transfer-message"></p>
+
+              <!-- RESULTADOS -->
+              <div
+                class="panel-grid"
+                style="grid-template-columns: 1fr 1fr; margin-top: 16px;"
+              >
+                <div class="info-card">
+                  <h2>Resultado</h2>
+
+                  <div class="info-line">
+                    <span>Cuota mensual</span>
+                    <span class="info-value" id="fee">—</span>
+                  </div>
+                  <div class="info-line">
+                    <span>Intereses totales</span>
+                    <span class="info-value" id="interest">—</span>
+                  </div>
+                  <div class="info-line">
+                    <span>Coste total</span>
+                    <span class="info-value" id="total">—</span>
+                  </div>
+                </div>
+
+                <div class="info-card">
+                  <h2>Salud financiera</h2>
+                  <div class="info-line">
+                    <span>Ratio cuota/ingresos</span>
+                    <span class="info-value" id="ratio">—</span>
+                  </div>
+
+                  <div
+                    id="health-note"
+                    style="
+                      margin-top: 10px;
+                      opacity: 0.85;
+                      font-size: 0.95rem;
+                      line-height: 1.35;
+                    "
+                  >
+                    Introduce tus ingresos para estimar el ratio.
+                  </div>
+
+                  <button class="ghost-btn" id="copy" style="margin-top: 14px;">
+                    Copiar resultado
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <!-- NOTA LEGAL -->
             <div
               style="
-                margin-top: 2rem;
+                margin-top: 16px;
+                opacity: 0.75;
+                font-size: 0.85rem;
                 text-align: center;
-                font-size: 1.1rem;
-                opacity: 0.8;
               "
             >
-              🚧 En construcción
+              *Cálculo estimado. No constituye oferta vinculante ni asesoramiento
+              financiero.
             </div>
           </div>
         </div>
       </main>
+
+      <!-- ANUNCIOS DERECHA (reutilizables) -->
+      <div id="right-rail-container"></div>
     </div>
 
     <!-- Sidebar -->
     <script src="/js/loadSidebar.js"></script>
 
-    <!-- Nombre del usuario (base) -->
+    <!-- Anuncios reutilizables -->
+    <script src="/js/loadRightRail.js"></script>
+
+    <!-- JS de esta página -->
+    <script src="/simuladorHipoteca.js"></script>
+
+    <!-- Nombre usuario -->
     <script>
-      // Base sencilla: luego lo conectas a tu backend
-      document.getElementById("user-name").textContent = "Jorge";
+      const stored = localStorage.getItem("userName");
+      document.getElementById("user-name").textContent = stored || "Jorge";
     </script>
   </body>
 </html>
