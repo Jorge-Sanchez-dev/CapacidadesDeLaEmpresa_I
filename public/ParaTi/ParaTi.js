@@ -38,7 +38,7 @@ function bannerHTML(ad) {
   `;
 }
 
-fetch("/components/right-rail.html")
+fetch("/ParaTi/ParaTi.html")
   .then((res) => res.text())
   .then((html) => {
     const container = document.getElementById("right-rail-container");
@@ -108,7 +108,7 @@ fetch("/components/right-rail.html")
       {
         variant: "rect",
         title: "Préstamo Express",
-        text: "Tu dinero en 24h (demo).",
+        text: "Tu dinero en 24h.",
         img: "/photos/PrestamosExpress.png",
         alt: "Préstamo Express",
         href: "#",

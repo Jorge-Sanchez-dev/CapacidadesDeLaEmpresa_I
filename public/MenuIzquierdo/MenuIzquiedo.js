@@ -1,4 +1,4 @@
-fetch("/components/sidebar.html")
+fetch("/MenuIzquierdo/MenuIzquierdo.html")
   .then((res) => res.text())
   .then((html) => {
     const container = document.getElementById("sidebar-container");
@@ -6,17 +6,16 @@ fetch("/components/sidebar.html")
 
     container.innerHTML = html;
 
-    // ✅ 1) Quitar active a todos
     const items = container.querySelectorAll(".sidebar-item");
     items.forEach((a) => a.classList.remove("active"));
 
-    // ✅ 2) Detectar página actual (archivo)
-    const current = window.location.pathname.split("/").pop(); // ej: "SimuladorHipoteca.html"
+    const currentPath = window.location.pathname.replace(/\/+$/, "");
 
-    // ✅ 3) Marcar active por href exacto
+    // match exacto por pathname completo
     const match = Array.from(items).find((a) => {
-      const hrefFile = (a.getAttribute("href") || "").split("/").pop();
-      return hrefFile === current;
+      const href = a.getAttribute("href") || "";
+      const hrefPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, "");
+      return hrefPath === currentPath;
     });
 
     if (match) match.classList.add("active");
