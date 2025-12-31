@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Redirigir al panel
-        window.location.href = "/panel.html";
+        window.location.href = "/Inicio/panel.html";
       } catch (err) {
         if (msg) {
           msg.textContent = "Error: " + err.message;
