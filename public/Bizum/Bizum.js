@@ -51,25 +51,32 @@ function getAuthHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-function setGreeting() {
+async function setGreetingFromBackend() {
   const el = $("greeting");
   if (!el) return;
 
-  // Ajusta según cómo guardes el user
-  const name =
-    localStorage.getItem("name") ||
-    localStorage.getItem("username") ||
-    (() => {
-      try {
-        const u = JSON.parse(localStorage.getItem("user") || "null");
-        return u?.name || u?.username || null;
-      } catch {
-        return null;
-      }
-    })();
+  const token = localStorage.getItem("token");
+  if (!token) return;
 
-  el.textContent = name ? `Hola, ${name} 👋` : "Hola, usuario 👋";
+  try {
+    const res = await fetch("/auth/dashboard", {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data?.user) return;
+
+    el.textContent = `Hola, ${data.user.name} 👋`;
+
+    // (opcional pero recomendable)
+    localStorage.setItem("userName", data.user.name);
+  } catch (err) {
+    console.error("Error cargando saludo Bizum:", err);
+  }
 }
+
 
 async function sendBizum({ toPhone, amount, concept }) {
   const res = await fetch(`${API_BASE_URL}${BIZUM_ENDPOINT}`, {
@@ -112,7 +119,7 @@ function clearForm() {
 
 // Init
 document.addEventListener("DOMContentLoaded", () => {
-  setGreeting();
+  setGreetingFromBackend();
   setMessage("");
 
   const form = $("transfer-form");
