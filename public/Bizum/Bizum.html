@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bizum | Banco Sánchez</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+
+  <body>
+    <div class="layout">
+      <!-- SIDEBAR (se carga por JS) -->
+      <div id="sidebar-container"></div>
+
+      <!-- MAIN -->
+      <main class="main-panel">
+        <div class="page-wrapper">
+          <header class="brand-header">
+            <img
+              src="/photos/logo%20sin%20fondo.png"
+              alt="Banco Sánchez"
+              class="brand-logo"
+            />
+            <h1 class="brand-name">Banco Sánchez</h1>
+          </header>
+
+          <p class="greeting" id="greeting">Hola, usuario 👋</p>
+
+          <!-- TARJETA SOLO DE BIZUM -->
+          <div class="card panel-card panel-card--wide">
+            <section class="transfer-section">
+              <h2>Enviar Bizum</h2>
+
+              <form id="transfer-form" class="transfer-form">
+                <div class="transfer-field">
+                  <label for="to-phone">Número de teléfono</label>
+                  <input
+                    type="tel"
+                    id="to-phone"
+                    placeholder="600123456"
+                    pattern="[0-9]{9}"
+                    required
+                  />
+                </div>
+
+                <div class="transfer-field">
+                  <label for="amount">Cantidad (€)</label>
+                  <input
+                    type="number"
+                    id="amount"
+                    step="0.01"
+                    min="0.01"
+                    required
+                  />
+                </div>
+
+                <div class="transfer-field">
+                  <label for="concept">Concepto</label>
+                  <input
+                    type="text"
+                    id="concept"
+                    placeholder="Cena, regalo..."
+                  />
+                </div>
+
+                <button type="submit" class="primary-btn small-btn">
+                  Enviar Bizum
+                </button>
+              </form>
+
+              <p id="transfer-message" class="transfer-message"></p>
+            </section>
+          </div>
+        </div>
+      </main>
+
+      <!-- ANUNCIOS DERECHA (reutilizables) -->
+      <div id="right-rail-container"></div>
+    </div>
+
+    <!-- Sidebar reutilizable -->
+    <script src="/MenuIzquierdo/MenuIzquierdo.js"></script>
+
+    <!-- Anuncios reutilizables -->
+    <script src="/ParaTi/ParaTi.js"></script>
+
+    <!-- JS de esta página (si luego quieres validar o simular el Bizum) -->
+    <script src="/Bizum/Bizum.js"></script>
+
+  </body>
+</html>
