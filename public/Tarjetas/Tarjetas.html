@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -7,6 +7,84 @@
   </head>
 
   <body>
+
+    <!-- MODAL 1: Elegir tipo -->
+    <div id="card-type-overlay" class="modal-overlay hidden">
+      <div class="modal">
+        <h3 class="modal-title">Crear nueva tarjeta</h3>
+
+        <form id="card-type-form">
+          <label class="radio-option">
+            <input type="radio" name="cardType" value="DEBIT" />
+            Tarjeta de débito
+          </label>
+
+          <label class="radio-option">
+            <input type="radio" name="cardType" value="CREDIT" />
+            Tarjeta de crédito
+          </label>
+
+          <div style="margin-top: 16px; display:flex; gap:10px; justify-content:flex-end;">
+            <button type="button" id="type-cancel" class="ghost-btn">
+              Cancelar
+            </button>
+
+            <button type="button" id="next-step" class="primary-btn small-btn">
+              Aceptar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 2: Configurar crédito -->
+    <div id="credit-overlay" class="modal-overlay hidden">
+      <div class="modal">
+        <h3 class="modal-title">Crear tarjeta de crédito</h3>
+
+        <form id="credit-form">
+          <div class="form-field">
+            <label for="credit-alias">Nombre de la tarjeta</label>
+            <input id="credit-alias" type="text" placeholder="Viajes" required />
+          </div>
+
+          <div class="form-field">
+            <label for="credit-limit">Límite de crédito (€)</label>
+            <input
+              id="credit-limit"
+              type="number"
+              min="100"
+              step="50"
+              placeholder="1500"
+              required
+            />
+          </div>
+
+          <div style="margin-top: 16px; display:flex; gap:10px; justify-content:flex-end;">
+            <button type="button" id="credit-cancel" class="ghost-btn">
+              Cancelar
+            </button>
+            <button type="submit" class="primary-btn small-btn">
+              Crear tarjeta
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL AVISOS / ERRORES (showModal) -->
+<div id="modal-overlay" class="modal-overlay hidden">
+  <div class="modal">
+    <h3 id="modal-title" class="modal-title">Aviso</h3>
+    <p id="modal-text" style="margin-top: 10px; opacity: 0.9;"></p>
+
+    <div style="margin-top: 16px; display:flex; justify-content:flex-end;">
+      <button id="modal-ok" class="primary-btn small-btn">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+
     <div class="layout">
       <!-- SIDEBAR -->
       <div id="sidebar-container"></div>
@@ -37,9 +115,9 @@
             <!-- CABECERA -->
             <div
               class="panel-footer"
-              style="justify-content: space-between; margin-top: 18px;"
+              style="justify-content: space-between; margin-top: 18px"
             >
-              <div style="opacity: 0.85; font-size: 0.95rem;">
+              <div style="opacity: 0.85; font-size: 0.95rem">
                 Tarjetas asociadas: <b id="cards-count">0</b>
               </div>
 
@@ -52,7 +130,7 @@
             <div
               class="panel-grid"
               id="cards-grid"
-              style="grid-template-columns: 1fr 1fr; margin-top: 18px;"
+              style="grid-template-columns: 1fr 1fr; margin-top: 18px"
             ></div>
 
             <!-- NOTA -->
@@ -70,7 +148,7 @@
         </div>
       </main>
 
-      <!-- ANUNCIOS DERECHA (si los usas en todas) -->
+      <!-- ANUNCIOS DERECHA -->
       <div id="right-rail-container"></div>
     </div>
 

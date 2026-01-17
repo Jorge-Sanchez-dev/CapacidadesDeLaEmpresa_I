@@ -6,6 +6,7 @@ import Account from "../models/Account"; // 👈 añade esto
 import { Request, Response } from "express";
 import Transfer from "../models/Transfer";
 import { verifyToken } from "../middleware/verifyToken"; // si usas ese tipo
+import Bizum from "../models/Bizum";
 
 const JWT_SECRET = process.env.JWT_SECRET as string; // asegúrate de tenerlo en .env
 
@@ -130,17 +131,16 @@ export const me = (req: any, res: Response) => {
   return res.json({ user: req.user });
 };
 
-// DASHBOARD: cuenta principal + últimos movimientos
+// DASHBOARD: cuenta principal + últimos movimientos (transfers + bizums)
 export const dashboard = async (req: any, res: Response) => {
   try {
-    // req.user lo rellena verifyToken
     const userId = req.user?._id;
 
     if (!userId) {
       return res.status(401).json({ message: "No autenticado" });
     }
 
-    // 1) Obtenemos la cuenta principal
+    // 1) Cuenta principal
     const mainAccount = await Account.findOne({
       owner: userId,
       isMain: true,
@@ -155,7 +155,7 @@ export const dashboard = async (req: any, res: Response) => {
       });
     }
 
-    // 2) Obtenemos los últimos movimientos (entradas y salidas)
+    // 2) Últimas transferencias (entradas y salidas)
     const transfers = await Transfer.find({
       status: "completed",
       $or: [{ fromAccount: mainAccount._id }, { toAccount: mainAccount._id }],
@@ -164,7 +164,16 @@ export const dashboard = async (req: any, res: Response) => {
       .limit(10)
       .lean();
 
-    // 3) Preparamos lo que se mandará al front
+    // 3) Últimos bizums del usuario (enviados y recibidos)
+    const bizums = await Bizum.find({
+      status: "COMPLETED",
+      $or: [{ fromUser: userId }, { toUser: userId }],
+    })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+
+    // 4) Resumen de cuenta
     const accountSummary = {
       alias: mainAccount.alias || "Cuenta principal",
       iban: mainAccount.iban,
@@ -172,30 +181,53 @@ export const dashboard = async (req: any, res: Response) => {
       currency: mainAccount.currency,
     };
 
-    const movements = transfers.map((t) => {
+    // 5) Mapear transfers al formato del front
+    const transferMovements = transfers.map((t: any) => {
       const isOutgoing =
         t.fromAccount.toString() === mainAccount._id.toString();
 
       return {
         id: t._id,
-        concept: t.concept,
+        //concept: t.concept || "Transferencia",
+        concept: t.concept ? `Transferencia · ${t.concept}` : "Transferencia",
         date: t.date,
-        amount: t.amount,
+        amount: Number(t.amount || 0),
         direction: isOutgoing ? "OUT" : "IN",
       };
     });
 
-    // 4) 🚀🚀🚀 AQUÍ ESTABA LO QUE TE FALTABA
+    // 6) Mapear bizums al formato del front
+    const bizumMovements = bizums.map((b: any) => {
+      const isOutgoing = String(b.fromUser) === String(userId);
+
+      return {
+        id: b._id,
+        concept: b.concept ? `Bizum · ${b.concept}` : "Bizum",
+        date: b.createdAt, // viene de timestamps
+        amount: Number(b.amount || 0),
+        direction: isOutgoing ? "OUT" : "IN",
+      };
+    });
+
+    // 7) Mezclar y ordenar por fecha (desc) y quedarnos con los 10 últimos
+    const allMovements = [...bizumMovements, ...transferMovements]
+      .sort(
+        (a: any, c: any) =>
+          new Date(c.date).getTime() - new Date(a.date).getTime()
+      )
+      .slice(0, 10);
+
     return res.json({
       user: req.user,
       account: accountSummary,
-      movements,
+      movements: allMovements,
     });
   } catch (err) {
     console.error("Error en dashboard:", err);
     return res.status(500).json({ message: "Error en el servidor" });
   }
 };
+
 
 // TRANSFERENCIA por IBAN
 export const transfer = async (req: any, res: Response) => {

@@ -3,6 +3,9 @@ import dotenv from "dotenv";
 import path from "path";
 import { connectMongoDB } from "./mongo";
 import authRoutes from "./routes/auth";
+import bizumRoutes from "./routes/bizum";
+import cardRoutes from "./routes/cards";
+
 
 dotenv.config();
 
@@ -11,6 +14,8 @@ app.use(express.json());
 
 app.use(express.static(path.join(process.cwd(), "public")));
 app.use("/auth", authRoutes);
+app.use("/bizum", bizumRoutes);
+app.use("/cards", cardRoutes);
 
 const PORT = process.env.PORT || 3000;
 

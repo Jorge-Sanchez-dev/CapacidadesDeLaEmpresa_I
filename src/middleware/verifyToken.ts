@@ -28,6 +28,7 @@ export async function verifyToken(
 
     // Guardar el usuario real en la request
 req.user = user as any;   // rápido y efectivo
+(req as any).userId = user._id; 
 
     next();
   } catch (err) {

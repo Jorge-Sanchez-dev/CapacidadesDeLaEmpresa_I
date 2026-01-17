@@ -4,7 +4,7 @@
 const API_BASE_URL = ""; // vacío = mismo dominio
 
 // Rutas típicas (ajústalas a tu backend)
-const BIZUM_ENDPOINT = "/api/bizum"; // <- si tu backend usa otra, cámbiala
+const BIZUM_ENDPOINT = "/bizum"; // <- si tu backend usa otra, cámbiala
 
 // Helpers
 const $ = (id) => document.getElementById(id);

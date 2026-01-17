@@ -18,8 +18,4 @@ router.get("/me", verifyToken, me);
 router.get("/dashboard", verifyToken, dashboard);
 router.post("/transfer", verifyToken, transfer);
 
-
-// 👇 Nueva ruta para el panel
-router.get("/dashboard", verifyToken, dashboard);
-
 export default router;

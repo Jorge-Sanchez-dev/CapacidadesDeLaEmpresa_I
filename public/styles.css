@@ -834,3 +834,73 @@ h1 {
   height: 90%;
   object-fit: contain;
 }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal {
+  width: min(420px, 95vw);
+  background: rgba(10, 18, 36, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 18px 18px 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+}
+
+.modal-title {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.modal-text {
+  margin: 0 0 14px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.35;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.radio-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.radio-option input {
+  accent-color: #4da3ff; /* color moderno */
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.form-field input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+}
