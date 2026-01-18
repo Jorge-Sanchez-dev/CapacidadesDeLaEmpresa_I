@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth";
 import bizumRoutes from "./routes/bizum";
 import cardRoutes from "./routes/cards";
 import loanRoutes from "./routes/loans";
+import adminRoutes from "./routes/admin";
 
 
 
@@ -20,6 +21,7 @@ app.use("/auth", authRoutes);
 app.use("/bizum", bizumRoutes);
 app.use("/cards", cardRoutes);
 app.use("/loans", loanRoutes);
+app.use("/admin", adminRoutes);
 
 const PORT = process.env.PORT || 3000;
 

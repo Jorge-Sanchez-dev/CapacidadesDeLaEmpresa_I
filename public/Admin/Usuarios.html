@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Usuarios | Banco Sánchez</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <div id="sidebar-container"></div>
+
+      <main class="main-panel">
+        <div class="page-wrapper">
+          <header class="brand-header">
+            <h1 class="brand-name">Usuarios</h1>
+          </header>
+
+          <p class="greeting" id="greeting">Gestión de usuarios</p>
+
+          <div class="card panel-card panel-card--wide">
+            <div
+              style="
+                display: flex;
+                gap: 12px;
+                align-items: center;
+                justify-content: space-between;
+              "
+            >
+              <h2 class="card-title" style="margin: 0">Listado</h2>
+
+              <div style="position: relative; max-width: 320px; width: 100%">
+                <span
+                  style="
+                    position: absolute;
+                    left: 10px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    opacity: 0.6;
+                    pointer-events: none;
+                  "
+                  >🔍</span
+                >
+
+                <input
+                  id="search"
+                  type="text"
+                  placeholder="Buscar usuarios..."
+                  style="
+                    width: 100%;
+                    padding: 10px 12px 10px 34px;
+                    border-radius: 12px;
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.15);
+                    color: inherit;
+                    outline: none;
+                  "
+                />
+              </div>
+            </div>
+
+            <div id="users-list" style="margin-top: 14px"></div>
+          </div>
+
+          <!-- Modal/Panel de edición -->
+          <div id="edit-modal-root"></div>
+        </div>
+      </main>
+    </div>
+
+    <script src="/Admin/MenuAdmin.js"></script>
+    <script src="/Admin/Usuarios.js"></script>
+  </body>
+</html>

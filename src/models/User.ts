@@ -25,7 +25,7 @@ export interface IUser extends Document {
   payrollDay?: number;     // día habitual de cobro (1–31)
 
   // Rol (por si luego haces admin)
-  role: "USER" | "ADMIN";
+  role?: "USER" | "ADMIN";
 }
 
 const userSchema = new Schema<IUser>(

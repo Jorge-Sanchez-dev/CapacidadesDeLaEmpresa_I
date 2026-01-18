@@ -2,13 +2,12 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/User";
-import Account from "../models/Account"; // 👈 añade esto
+import Account from "../models/Account";
 import { Request, Response } from "express";
 import Transfer from "../models/Transfer";
-import { verifyToken } from "../middleware/verifyToken"; // si usas ese tipo
 import Bizum from "../models/Bizum";
 
-const JWT_SECRET = process.env.JWT_SECRET as string; // asegúrate de tenerlo en .env
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 if (!JWT_SECRET) {
   console.warn("⚠️ No se ha definido JWT_SECRET en el .env");
@@ -32,9 +31,22 @@ export const register = async (req: Request, res: Response) => {
       mainCurrency,
     } = req.body;
 
-    // ... (misma validación y comprobaciones que ya tienes)
+    // ✅ ejemplo mínimo de validación (ajusta a lo tuyo)
+    if (!email || !password || !name) {
+      return res.status(400).json({ message: "Datos incompletos" });
+    }
+
+    // ✅ evitar email duplicado
+    const exists = await User.findOne({ email }).lean();
+    if (exists) {
+      return res.status(400).json({ message: "El email ya está registrado" });
+    }
 
     const hashed = await bcrypt.hash(password, 10);
+
+    // ✅ PRIMER USER = ADMIN, resto = USER
+    const existingAdmin = await User.findOne({ role: "ADMIN" }).lean();
+    const roleToAssign = existingAdmin ? "USER" : "ADMIN";
 
     const user: IUser = await User.create({
       name,
@@ -49,18 +61,18 @@ export const register = async (req: Request, res: Response) => {
       phone,
       password: hashed,
       mainCurrency,
+      role: roleToAssign, // ✅ AÑADIDO
     });
 
     // 👉 Crear una cuenta vacía asociada a este usuario
-    // Generamos un IBAN y accountNumber "falsos" para el proyecto
     const timestamp = Date.now().toString().slice(-10);
-    const fakeAccountNumber = "0000" + timestamp; // 14 dígitos aprox
+    const fakeAccountNumber = "0000" + timestamp;
     const fakeIban = `ES12 1111 2222 ${timestamp.slice(-4)}`;
-    const normalizedIban = fakeIban.replace(/\s+/g, ""); // 👈 ELIMINA ESPACIOS
+    const normalizedIban = fakeIban.replace(/\s+/g, "");
 
     await Account.create({
       owner: user._id,
-      iban: normalizedIban, // 👈 SE GUARDA NORMALIZADO
+      iban: normalizedIban,
       accountNumber: fakeAccountNumber,
       currency: mainCurrency,
       balance: 0,
@@ -70,9 +82,15 @@ export const register = async (req: Request, res: Response) => {
       isMain: true,
     });
 
-    return res
-      .status(201)
-      .json({ message: "Usuario y cuenta creados correctamente" });
+    return res.status(201).json({
+      message: "Usuario y cuenta creados correctamente",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: (user as any).role,
+      },
+    });
   } catch (err) {
     console.error("Error en register:", err);
     return res.status(500).json({ message: "Error en el servidor" });
@@ -91,7 +109,6 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(400).json({ message: "Usuario no existe" });
     }
@@ -105,13 +122,13 @@ export const login = async (req: Request, res: Response) => {
       expiresIn: "7d",
     });
 
-    // devolvemos también datos básicos para el front
     const safeUser = {
       id: user._id,
       name: user.name,
       surname: user.surname,
       email: user.email,
       mainCurrency: user.mainCurrency,
+      role: (user as any).role, // ✅
     };
 
     return res.json({ token, user: safeUser });
@@ -121,13 +138,9 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-// ME (usuario autenticado)
+// ME
 export const me = (req: any, res: Response) => {
-  // req.user lo rellenará el middleware verifyToken
-  if (!req.user) {
-    return res.status(401).json({ message: "No autenticado" });
-  }
-
+  if (!req.user) return res.status(401).json({ message: "No autenticado" });
   return res.json({ user: req.user });
 };
 
@@ -135,27 +148,20 @@ export const me = (req: any, res: Response) => {
 export const dashboard = async (req: any, res: Response) => {
   try {
     const userId = req.user?._id;
-
-    if (!userId) {
-      return res.status(401).json({ message: "No autenticado" });
-    }
+    if (!userId) return res.status(401).json({ message: "No autenticado" });
 
     // 1) Cuenta principal
     const mainAccount = await Account.findOne({
       owner: userId,
       isMain: true,
       status: "active",
-    });
+    }).lean();
 
     if (!mainAccount) {
-      return res.json({
-        user: req.user,
-        account: null,
-        movements: [],
-      });
+      return res.json({ user: req.user, account: null, movements: [] });
     }
 
-    // 2) Últimas transferencias (entradas y salidas)
+    // 2) Últimas transferencias
     const transfers = await Transfer.find({
       status: "completed",
       $or: [{ fromAccount: mainAccount._id }, { toAccount: mainAccount._id }],
@@ -164,7 +170,7 @@ export const dashboard = async (req: any, res: Response) => {
       .limit(10)
       .lean();
 
-    // 3) Últimos bizums del usuario (enviados y recibidos)
+    // 3) Últimos bizums
     const bizums = await Bizum.find({
       status: "COMPLETED",
       $or: [{ fromUser: userId }, { toUser: userId }],
@@ -173,7 +179,7 @@ export const dashboard = async (req: any, res: Response) => {
       .limit(10)
       .lean();
 
-    // 4) Resumen de cuenta
+    // 4) Resumen cuenta
     const accountSummary = {
       alias: mainAccount.alias || "Cuenta principal",
       iban: mainAccount.iban,
@@ -181,14 +187,17 @@ export const dashboard = async (req: any, res: Response) => {
       currency: mainAccount.currency,
     };
 
-    // 5) Mapear transfers al formato del front
-    const transferMovements = transfers.map((t: any) => {
-      const isOutgoing =
-        t.fromAccount.toString() === mainAccount._id.toString();
+    // helper fecha segura
+    const toMillis = (d: any) => {
+      const t = new Date(d).getTime();
+      return Number.isFinite(t) ? t : 0;
+    };
 
+    // 5) Transfers -> movements
+    const transferMovements = transfers.map((t: any) => {
+      const isOutgoing = String(t.fromAccount) === String(mainAccount._id);
       return {
         id: t._id,
-        //concept: t.concept || "Transferencia",
         concept: t.concept ? `Transferencia · ${t.concept}` : "Transferencia",
         date: t.date,
         amount: Number(t.amount || 0),
@@ -196,25 +205,21 @@ export const dashboard = async (req: any, res: Response) => {
       };
     });
 
-    // 6) Mapear bizums al formato del front
+    // 6) Bizums -> movements
     const bizumMovements = bizums.map((b: any) => {
       const isOutgoing = String(b.fromUser) === String(userId);
-
       return {
         id: b._id,
         concept: b.concept ? `Bizum · ${b.concept}` : "Bizum",
-        date: b.createdAt, // viene de timestamps
+        date: b.createdAt,
         amount: Number(b.amount || 0),
         direction: isOutgoing ? "OUT" : "IN",
       };
     });
 
-    // 7) Mezclar y ordenar por fecha (desc) y quedarnos con los 10 últimos
+    // 7) Mezclar + ordenar + top 10
     const allMovements = [...bizumMovements, ...transferMovements]
-      .sort(
-        (a: any, c: any) =>
-          new Date(c.date).getTime() - new Date(a.date).getTime()
-      )
+      .sort((a, c) => toMillis(c.date) - toMillis(a.date))
       .slice(0, 10);
 
     return res.json({
@@ -228,14 +233,11 @@ export const dashboard = async (req: any, res: Response) => {
   }
 };
 
-
-// TRANSFERENCIA por IBAN
+// TRANSFERENCIA por IBAN (tuya, sin cambios relevantes)
 export const transfer = async (req: any, res: Response) => {
   try {
-    const user = req.user; // viene de verifyToken
-    if (!user) {
-      return res.status(401).json({ message: "No autenticado" });
-    }
+    const user = req.user;
+    if (!user) return res.status(401).json({ message: "No autenticado" });
 
     const { toIban, amount, concept } = req.body;
 
@@ -246,13 +248,12 @@ export const transfer = async (req: any, res: Response) => {
     }
 
     const numericAmount = Number(amount);
-    if (isNaN(numericAmount) || numericAmount <= 0) {
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
       return res
         .status(400)
         .json({ message: "La cantidad debe ser un número positivo" });
     }
 
-    // 1) Cuenta origen = cuenta principal del usuario
     const fromAccount = await Account.findOne({
       owner: user._id,
       isMain: true,
@@ -271,7 +272,6 @@ export const transfer = async (req: any, res: Response) => {
         .json({ message: "Saldo insuficiente en la cuenta de origen" });
     }
 
-    // 2) Cuenta destino por IBAN
     const toAccount = await Account.findOne({
       iban: toIban.replace(/\s+/g, ""),
       status: "active",
@@ -283,21 +283,18 @@ export const transfer = async (req: any, res: Response) => {
         .json({ message: "No se ha encontrado la cuenta destino" });
     }
 
-    // Opcional: evitar transferirse a sí mismo
     if (toAccount._id.toString() === fromAccount._id.toString()) {
       return res
         .status(400)
         .json({ message: "La cuenta destino no puede ser la misma" });
     }
 
-    // 3) Actualizar saldos
     fromAccount.balance -= numericAmount;
     toAccount.balance += numericAmount;
 
     await fromAccount.save();
     await toAccount.save();
 
-    // 4) Crear registro de transferencia
     const destUser = await User.findById(toAccount.owner).lean();
     const counterpartName = destUser
       ? `${destUser.name} ${destUser.surname}`.trim()
@@ -311,7 +308,7 @@ export const transfer = async (req: any, res: Response) => {
       concept: concept || "Transferencia bancaria",
       date: new Date(),
       status: "completed",
-      direction: "OUT", // desde el punto de vista de la cuenta origen
+      direction: "OUT",
       counterpartName,
       counterpartIban: toAccount.iban,
     });

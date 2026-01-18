@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin | Banco Sánchez</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <div id="sidebar-container"></div>
+
+      <main class="main-panel">
+        <div class="page-wrapper">
+          <header class="brand-header">
+            <h1 class="brand-name">Panel Administrador</h1>
+          </header>
+
+          <p class="greeting" id="greeting">Hola, Admin 👋</p>
+
+          <div class="card panel-card panel-card--wide">
+            <h2 class="card-title">Dashboard</h2>
+
+            <div id="kpis" class="kpis-grid"></div>
+
+            <h3 style="margin-top: 16px">Actividad reciente</h3>
+            <div id="recent-movements"></div>
+          </div>
+
+          <div class="card panel-card panel-card--wide">
+            <h2 class="card-title">Usuarios</h2>
+            <div id="users-list"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="/Admin/MenuAdmin.js"></script>
+    <script src="/Admin/Admin.js"></script>
+  </body>
+</html>
