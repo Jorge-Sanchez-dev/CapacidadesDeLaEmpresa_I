@@ -904,3 +904,69 @@ h1 {
   background: rgba(255,255,255,0.05);
   color: #fff;
 }
+
+.select-wrap {
+  position: relative;
+}
+
+.select-wrap .select-arrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0.8;
+  font-size: 0.95rem;
+}
+
+/* --- Select "glass" --- */
+.select-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.select-wrap select {
+  width: 100%;
+  height: 44px;
+  padding: 12px 44px 12px 14px;
+  border-radius: 14px;
+
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(10, 18, 40, 0.55);
+  color: #fff;
+
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  font-size: 0.95rem;
+}
+
+/* hover / focus */
+.select-wrap select:hover {
+  border-color: rgba(255,255,255,0.24);
+}
+
+.select-wrap select:focus {
+  border-color: rgba(0, 170, 255, 0.6);
+  box-shadow: 0 0 0 4px rgba(0, 170, 255, 0.18);
+}
+
+/* flecha */
+.select-wrap .select-arrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0.8;
+  font-size: 0.95rem;
+}
+
+/* opciones (depende del navegador, pero ayuda) */
+.select-wrap select option {
+  background: #0b1530;
+  color: #fff;
+}
+

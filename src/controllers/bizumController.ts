@@ -44,9 +44,6 @@ let toAcc = await Account.findOne({
   status: "active",
 }).session(session);
 
-// 👇 LOGS DE DEBUG (TEMPORALES)
-console.log("fromAcc:", fromAcc?._id);
-console.log("toAcc:", toAcc?._id);
 
 if (!fromAcc || !toAcc) {
   return res.status(404).json({ message: "Cuenta origen o destino no encontrada" });

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -25,9 +25,7 @@
           </header>
 
           <!-- SALUDO -->
-          <p class="greeting">
-            Hola, <span id="user-name">usuario</span> 👋
-          </p>
+          <p class="greeting">Hola, <span id="user-name">usuario</span> 👋</p>
 
           <!-- CARD PRINCIPAL -->
           <div class="card panel-card panel-card--wide">
@@ -39,13 +37,13 @@
             <!-- RESUMEN + CONSEJOS -->
             <div
               class="panel-grid"
-              style="grid-template-columns: 1.15fr 1fr; margin-top: 24px;"
+              style="grid-template-columns: 1.15fr 1fr; margin-top: 24px"
             >
               <section class="info-card">
                 <h2>Resumen rápido</h2>
 
                 <div class="info-line">
-                  <span>LTV (financiación)</span>
+                  <span>LTV (Loan To Value)</span>
                   <span class="info-value" id="ltv">—</span>
                 </div>
                 <div class="info-line">
@@ -57,7 +55,7 @@
                   <span class="info-value" id="loan">—</span>
                 </div>
 
-                <button class="ghost-btn" id="reset" style="margin-top: 12px;">
+                <button class="ghost-btn" id="reset" style="margin-top: 12px">
                   Reiniciar
                 </button>
               </section>
@@ -86,7 +84,7 @@
             </div>
 
             <!-- SIMULADOR -->
-            <section class="transfer-section" style="margin-top: 24px;">
+            <section class="transfer-section" style="margin-top: 24px">
               <div class="transfer-header">
                 <h2>Datos de la vivienda</h2>
                 <p>Rellena los datos para calcular la cuota.</p>
@@ -96,7 +94,8 @@
                 id="mortgage-form"
                 class="transfer-form"
                 style="
-                  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr)
+                  grid-template-columns:
+                    minmax(0, 1.2fr) minmax(0, 1fr)
                     minmax(0, 1fr) auto;
                 "
               >
@@ -155,12 +154,15 @@
                 </div>
 
                 <div class="transfer-field">
-                  <label for="type">Tipo</label>
-                  <div class="select-wrapper">
-                    <select id="type">
-                      <option value="fixed" selected>Fija</option>
-                      <option value="variable">Variable (estimación)</option>
+                  <label for="mortgage-type">Tipo</label>
+
+                  <div class="select-wrap">
+                    <select id="mortgage-type" required>
+                      <option value="fixed">Fija</option>
+                      <option value="variable">Variable</option>
+                      <option value="mixed">Mixta</option>
                     </select>
+                    <span class="select-arrow">▾</span>
                   </div>
                 </div>
 
@@ -181,7 +183,7 @@
               <!-- RESULTADOS -->
               <div
                 class="panel-grid"
-                style="grid-template-columns: 1fr 1fr; margin-top: 16px;"
+                style="grid-template-columns: 1fr 1fr; margin-top: 16px"
               >
                 <div class="info-card">
                   <h2>Resultado</h2>
@@ -235,8 +237,8 @@
                 text-align: center;
               "
             >
-              *Cálculo estimado. No constituye oferta vinculante ni asesoramiento
-              financiero.
+              *Cálculo estimado. No constituye oferta vinculante ni
+              asesoramiento financiero.
             </div>
           </div>
         </div>
@@ -246,7 +248,7 @@
       <div id="right-rail-container"></div>
     </div>
 
-     <!-- Reutilizables -->
+    <!-- Reutilizables -->
     <script src="/MenuIzquierdo/MenuIzquierdo.js"></script>
     <script src="/ParaTi/ParaTi.js"></script>
 

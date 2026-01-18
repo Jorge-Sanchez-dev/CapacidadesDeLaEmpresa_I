@@ -5,6 +5,9 @@ import { connectMongoDB } from "./mongo";
 import authRoutes from "./routes/auth";
 import bizumRoutes from "./routes/bizum";
 import cardRoutes from "./routes/cards";
+import loanRoutes from "./routes/loans";
+
+
 
 
 dotenv.config();
@@ -16,6 +19,7 @@ app.use(express.static(path.join(process.cwd(), "public")));
 app.use("/auth", authRoutes);
 app.use("/bizum", bizumRoutes);
 app.use("/cards", cardRoutes);
+app.use("/loans", loanRoutes);
 
 const PORT = process.env.PORT || 3000;
 

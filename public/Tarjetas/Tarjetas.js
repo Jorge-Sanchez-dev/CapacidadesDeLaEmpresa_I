@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <b>${formatEUR(shownMoney)}</b>
             </div>
           </div>
-          <button class="ghost-btn" data-remove="${c._id}">🗑️</button>
+          <button class="ghost-btn" data-remove="${c._id}"> Borrar </button>
         </div>
 
         <div style="margin-top:12px;">

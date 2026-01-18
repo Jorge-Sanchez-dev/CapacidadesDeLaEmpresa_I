@@ -52,7 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const years = Number(document.getElementById("years").value);
       const rate = Number(document.getElementById("rate").value);
       const income = Number(document.getElementById("income").value || 0);
-      const type = document.getElementById("type").value;
+
+      // ✅ FIX: el select correcto es mortgage-type
+      const type = document.getElementById("mortgage-type").value;
 
       if (!price || price <= 0 || down < 0 || years <= 0 || rate < 0) {
         msg.textContent = "Revisa los datos: precio, entrada, plazo e interés.";
@@ -85,11 +87,11 @@ document.addEventListener("DOMContentLoaded", () => {
       setText("interest", formatEUR(interest));
 
       // ratio cuota/ingresos
+      const note = document.getElementById("health-note");
       if (income && income > 0) {
         const ratio = (fee / income) * 100;
         setText("ratio", `${ratio.toFixed(1)}%`);
 
-        const note = document.getElementById("health-note");
         if (note) {
           if (ratio <= 30) note.textContent = "✅ Ratio saludable (≤ 30%).";
           else if (ratio <= 40) note.textContent = "⚠️ Ratio alto (30–40%). Cuidado con el margen.";
@@ -97,7 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       } else {
         setText("ratio", "—");
-        const note = document.getElementById("health-note");
         if (note) note.textContent = "Introduce tus ingresos para estimar el ratio.";
       }
 
@@ -122,6 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const total = document.getElementById("total")?.textContent || "—";
       const ltv = document.getElementById("ltv")?.textContent || "—";
       const text = `Simulación Hipoteca - Banco Sánchez\nCuota: ${fee}\nCoste total: ${total}\nLTV: ${ltv}`;
+
       navigator.clipboard.writeText(text).then(() => {
         alert("Resultado copiado ✅");
       });
