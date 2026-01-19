@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Préstamos | Banco Sánchez</title>
+    <title>Préstamos | Admin · Banco Sánchez</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
 
@@ -17,24 +17,34 @@
             <h1 class="brand-name">Préstamos</h1>
           </header>
 
-          <p class="greeting">Aquí gestionaremos los préstamos. De momento… 👷‍♂️</p>
+          <p class="greeting">Bandeja del administrador para solicitudes de préstamo</p>
 
           <div class="card panel-card panel-card--wide">
-            <h2 class="card-title">En construcción</h2>
+            <div class="users-toolbar">
+              <h2 class="card-title users-title" style="margin:0;">Solicitudes</h2>
 
-            <div class="info-card">
-              <h2>🚧 Estamos trabajando en ello</h2>
-              <div style="opacity: 0.85; line-height: 1.6">
-                Esta sección aún no está disponible.
-                <br />
-                Vuelve pronto: los préstamos están en la cola… justo detrás del café ☕️
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <label style="opacity:.8;">Estado</label>
+                <select id="status" style="padding:8px 10px; border-radius:10px;">
+                  <option value="PENDING">Pendientes</option>
+                  <option value="APPROVED">Aprobadas</option>
+                  <option value="REJECTED">Denegadas</option>
+                </select>
+
+                <button class="btn secondary" id="btn-refresh">Actualizar</button>
               </div>
             </div>
+
+            <div id="loans-list" class="users-list" style="margin-top:14px;"></div>
           </div>
+
+          <!-- Modal confirmación -->
+          <div id="modal-root"></div>
         </div>
       </main>
     </div>
 
     <script src="/Admin/MenuAdmin.js"></script>
+    <script src="/Admin/Prestamos.js"></script>
   </body>
 </html>

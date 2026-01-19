@@ -1,4 +1,4 @@
-import { Schema, model, Types, Document } from "mongoose";
+import mongoose, { Schema, model, Types, Document } from "mongoose";
 
 export interface ILoan extends Document {
   user: Types.ObjectId;
@@ -18,32 +18,34 @@ export interface ILoan extends Document {
   decidedBy?: Types.ObjectId;        // admin que decide
 }
 
-const loanSchema = new Schema<ILoan>(
-  {
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    account: { type: Schema.Types.ObjectId, ref: "Account" },
+export type LoanStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
 
+const LoanSchema = new Schema(
+  {
+    applicant: { type: Schema.Types.ObjectId, ref: "User", required: true },
+
+    // Datos de solicitud
     amount: { type: Number, required: true, min: 1 },
     months: { type: Number, required: true, min: 1 },
-    apr: { type: Number, required: true, min: 0 },
+    purpose: { type: String, default: "" },
 
-    concept: { type: String, default: "" },
+    // Decisión / estado
+    status: { type: String, enum: ["PENDING", "APPROVED", "REJECTED", "CANCELLED"], default: "PENDING" },
+    decidedAt: { type: Date },
+    decidedBy: { type: Schema.Types.ObjectId, ref: "User" }, // admin que decide
+    decisionReason: { type: String, default: "" },
 
-    status: {
-      type: String,
-      enum: ["PENDING", "APPROVED", "REJECTED", "ACTIVE", "CLOSED"],
-      default: "PENDING",
-    },
+    // Si se aprueba: parámetros del préstamo
+    interestAPR: { type: Number, default: 0 }, // % anual
+    monthlyPayment: { type: Number, default: 0 },
+    totalToPay: { type: Number, default: 0 },
 
-    monthlyFee: { type: Number, required: true },
-    totalToPay: { type: Number, required: true },
-    remaining: { type: Number, required: true },
-
-    startDate: { type: Date },
-    decisionAt: { type: Date },
-    decidedBy: { type: Schema.Types.ObjectId, ref: "User" },
+    // Vida del préstamo (simple)
+    startedAt: { type: Date },
+    nextPaymentAt: { type: Date },
+    remainingToPay: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
-export default model<ILoan>("Loan", loanSchema);
+export default mongoose.model("Loan", LoanSchema);

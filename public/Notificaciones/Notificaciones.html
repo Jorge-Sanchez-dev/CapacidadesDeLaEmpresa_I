@@ -1,65 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>SECCIÓN | Banco Sánchez</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Notificaciones | Banco Sánchez</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
 
   <body>
     <div class="layout">
-      <!-- SIDEBAR (reutilizable) -->
       <div id="sidebar-container"></div>
 
-      <!-- MAIN -->
       <main class="main-panel">
         <div class="page-wrapper">
-          <!-- LOGO -->
           <header class="brand-header">
-            <img
-              src="/photos/logo%20sin%20fondo.png"
-              alt="Banco Sánchez"
-              class="brand-logo"
-            />
-            <h1 class="brand-name">Banco Sánchez</h1>
+            <h1 class="brand-name">Notificaciones</h1>
           </header>
 
-          <!-- SALUDO -->
-          <p class="greeting">
-            Hola, <span id="user-name">usuario</span> 👋
-          </p>
+          <p class="greeting">Aquí verás avisos del sistema (préstamos, transferencias, etc.)</p>
 
-          <!-- CARD CENTRAL -->
           <div class="card panel-card panel-card--wide">
-            <h2 class="card-title">TÍTULO DE LA SECCIÓN</h2>
-            <p class="card-subtitle">
-              Esta sección estará disponible próximamente.
-            </p>
+            <div class="users-toolbar">
+              <h2 class="card-title users-title">Bandeja</h2>
 
-            <div
-              style="
-                margin-top: 2rem;
-                text-align: center;
-                font-size: 1.1rem;
-                opacity: 0.8;
-              "
-            >
-              🚧 En construcción
+              <div style="display:flex; gap:10px;">
+                <button class="btn secondary" id="btn-refresh">Actualizar</button>
+                <button class="btn primary" id="btn-mark-all">Marcar todo como leído</button>
+              </div>
             </div>
+
+            <div id="notifications-list" class="users-list" style="margin-top:14px;"></div>
           </div>
         </div>
       </main>
     </div>
 
-     <!-- Reutilizables -->
     <script src="/MenuIzquierdo/MenuIzquierdo.js"></script>
-    
-    <script src="/ParaTi/ParaTi.js"></script>
-
-    <!-- Nombre del usuario (base) -->
-    <script>
-      // Base sencilla: luego lo conectas a tu backend
-      document.getElementById("user-name").textContent = "Usuario";
-    </script>
+    <script src="/Notificaciones/Notificaciones.js"></script>
   </body>
 </html>
