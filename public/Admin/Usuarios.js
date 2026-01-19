@@ -1,3 +1,8 @@
+// /Admin/Usuarios.js
+
+// ✅ CAMBIA SOLO ESTO si tu backend está montado en /api/admin
+const API_BASE = "/admin"; // o "/api/admin"
+
 document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -5,14 +10,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Carga usuarios
   await loadUsers(token);
 
-  // Buscador
   const search = document.getElementById("search");
-  if (search) {
-    search.addEventListener("input", () => filterUsers());
-  }
+  if (search) search.addEventListener("input", () => filterUsers());
 });
 
 let ALL_USERS = [];
@@ -24,17 +25,17 @@ async function loadUsers(token) {
   list.innerHTML = `<div class="info-card"><h2>Cargando...</h2></div>`;
 
   try {
-    const res = await fetch("/admin/users", {
+    const res = await fetch(`${API_BASE}/users`, {
       headers: { Authorization: "Bearer " + token },
     });
 
-    const data = await res.json().catch(() => null);
-    if (!res.ok) throw new Error(data?.message || "Error cargando usuarios");
+    const body = await readBody(res);
+    if (!res.ok) throw new Error(getMsg(body) || "Error cargando usuarios");
 
-    ALL_USERS = data.users || [];
+    ALL_USERS = body?.users || [];
     renderUsers(ALL_USERS, token);
   } catch (err) {
-    console.error(err);
+    console.error("loadUsers error:", err);
     list.innerHTML = `
       <div class="info-card">
         <h2>Error</h2>
@@ -117,15 +118,15 @@ async function toggleSummary(userId, token) {
   box.innerHTML = `<div style="opacity:.8">Cargando resumen...</div>`;
 
   try {
-    const res = await fetch(`/admin/users/${userId}/summary`, {
+    const res = await fetch(`${API_BASE}/users/${userId}/summary`, {
       headers: { Authorization: "Bearer " + token },
     });
 
-    const data = await res.json().catch(() => null);
-    if (!res.ok) throw new Error(data?.message || "No se pudo cargar el resumen");
+    const body = await readBody(res);
+    if (!res.ok) throw new Error(getMsg(body) || "No se pudo cargar el resumen");
 
-    const acc = data.account;
-    const movs = data.movements || [];
+    const acc = body?.account;
+    const movs = body?.movements || [];
 
     box.innerHTML = `
       <div class="info-card" style="margin-top:10px;">
@@ -148,7 +149,7 @@ async function toggleSummary(userId, token) {
       </div>
     `;
   } catch (err) {
-    console.error(err);
+    console.error("toggleSummary error:", err);
     box.innerHTML = `
       <div class="info-card">
         <h2>Error</h2>
@@ -182,7 +183,7 @@ function openEditModal(u, token) {
   const root = document.getElementById("edit-modal-root");
   if (!root) return;
 
-  root.innerHTML = ""; // limpia si había uno
+  root.innerHTML = "";
 
   const overlay = document.createElement("div");
   overlay.style.position = "fixed";
@@ -218,6 +219,7 @@ function openEditModal(u, token) {
       </div>
 
       <div id="ed-msg" style="margin-top:10px; opacity:.9;"></div>
+      <div id="ed-debug" style="margin-top:8px; opacity:.75; font-size:.9em;"></div>
     </div>
   `;
 
@@ -242,10 +244,13 @@ function openEditModal(u, token) {
     };
 
     const msg = overlay.querySelector("#ed-msg");
+    const dbg = overlay.querySelector("#ed-debug");
     msg.textContent = "Guardando...";
+    dbg.textContent = "";
 
     try {
-      const res = await fetch(`/admin/users/${u._id}`, {
+      const url = `${API_BASE}/users/${u._id}`;
+      const res = await fetch(url, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -254,19 +259,31 @@ function openEditModal(u, token) {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.message || "No se pudo guardar");
+      const body = await readBody(res);
+
+      // ✅ Debug visible (para cazar 401/403/404/500 sin llorar)
+      dbg.textContent = `Status: ${res.status} · ${url}`;
+
+      console.log("PUT user:", res.status, url, body);
+
+      if (!res.ok) {
+        throw new Error(getMsg(body) || "No se pudo guardar");
+      }
 
       msg.textContent = "Guardado ✅ (recargando...)";
       setTimeout(() => window.location.reload(), 600);
     } catch (err) {
-      console.error(err);
+      console.error("SAVE ERROR:", err);
       msg.textContent = err.message || "Error guardando";
     }
   });
 
   root.appendChild(overlay);
 }
+
+/* =========================
+   Helpers
+   ========================= */
 
 function formatMoney(n) {
   const num = Number(n || 0);
@@ -288,4 +305,30 @@ function escapeAttr(str) {
     .replaceAll('"', "&quot;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
+}
+
+async function readBody(res) {
+  const ct = (res.headers.get("content-type") || "").toLowerCase();
+
+  if (ct.includes("application/json")) {
+    return await res.json().catch(() => null);
+  }
+
+  // texto/html etc.
+  const text = await res.text().catch(() => "");
+  if (!text) return null;
+
+  // por si viene JSON con content-type mal puesto
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { message: text };
+  }
+}
+
+function getMsg(body) {
+  if (!body) return "";
+  if (typeof body === "string") return body;
+  if (body.message) return body.message;
+  return "";
 }

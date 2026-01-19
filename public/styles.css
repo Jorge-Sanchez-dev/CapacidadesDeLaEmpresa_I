@@ -970,3 +970,111 @@ h1 {
   color: #fff;
 }
 
+.users-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.users-title {
+  margin: 0;
+}
+
+.users-list {
+  margin-top: 14px;
+}
+
+/* buscador */
+.search-box {
+  position: relative;
+  max-width: 320px;
+  width: 100%;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 12px 10px 34px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: inherit;
+  outline: none;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Arregla el solape label/valor en las tarjetas */
+.info-line {
+  display: grid;
+  grid-template-columns: 90px 1fr; /* label | valor */
+  gap: 12px;
+  align-items: center;
+}
+
+.info-line span:first-child {
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.info-line .info-value {
+  text-align: right;
+  font-weight: 500;
+  word-break: break-word; /* emails largos */
+}
+
+/* SOLO para la lista de usuarios */
+#users-list .info-line {
+  display: grid;
+  grid-template-columns: 90px auto; /* etiqueta | valor */
+  gap: 12px;
+  align-items: center;
+}
+
+/* Etiquetas: Email / Teléfono / Rol */
+#users-list .info-line span:first-child {
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+/* Valores: todo alineado a la izquierda */
+#users-list .info-line .info-value {
+  text-align: left;          /* 🔥 CLAVE */
+  font-weight: 500;
+  word-break: break-word;    /* emails largos */
+}
+
+#users-list .info-line {
+  margin-top: 4px;
+}
+
+/* =========================
+   FIX Usuarios (alineación izquierda)
+   ========================= */
+#users-list .info-line {
+  display: grid !important;
+  grid-template-columns: 90px minmax(0, 1fr) !important;
+  gap: 12px !important;
+  align-items: center !important;
+  justify-content: start !important;
+}
+
+#users-list .info-line > span:first-child {
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+#users-list .info-line .info-value {
+  text-align: left !important;
+  justify-self: start !important;
+  align-self: center !important;
+  margin-left: 0 !important;
+  word-break: break-word;
+}

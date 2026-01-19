@@ -29,7 +29,7 @@ async function loadDashboard(token) {
       <section class="info-card">
         <h2>Usuarios</h2>
         <div class="info-line"><span>Total</span><span class="info-value">${k.usersTotal ?? "—"}</span></div>
-        <div class="info-line"><span>Nuevos (7d)</span><span class="info-value">${k.usersLast7d ?? "—"}</span></div>
+        <div class="info-line"><span>Nuevos (Últimos 7 días)</span><span class="info-value">${k.usersLast7d ?? "—"}</span></div>
       </section>
 
       <section class="info-card">
@@ -39,7 +39,7 @@ async function loadDashboard(token) {
       </section>
 
       <section class="info-card">
-        <h2>Movimientos (7d)</h2>
+        <h2>Movimientos (Últimos 7 días)</h2>
         <div class="info-line"><span>Transfers</span><span class="info-value">${k.transfersLast7d ?? "—"}</span></div>
         <div class="info-line"><span>Bizums</span><span class="info-value">${k.bizumsLast7d ?? "—"}</span></div>
       </section>
