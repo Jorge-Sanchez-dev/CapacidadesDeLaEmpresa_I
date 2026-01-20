@@ -241,72 +241,18 @@
             </section>
 
             <!-- PRÉSTAMOS ACTIVOS -->
-            <section class="transfer-section" style="margin-top: 18px;">
-              <div class="transfer-header">
-                <h2>Préstamos activos</h2>
-              </div>
+<section class="transfer-section" style="margin-top: 18px;">
+  <div class="transfer-header">
+    <h2>Préstamos activos</h2>
+  </div>
 
-              <div
-                class="movements-list"
-                id="loans-list"
-                style="max-height: 220px;"
-              >
-                <div class="movement">
-                  <div>
-                    <p class="movement-concept">
-                      <b>Préstamo personal</b> · Reforma
-                    </p>
-                    <p class="movement-date">
-                      Inicio: 2025-10-01 · Plazo: 24 meses
-                    </p>
-                  </div>
-                  <div style="text-align: right;">
-                    <div class="movement-amount">125,40 €/mes</div>
-                    <div class="movement-date">Pendiente: 2.610,00 €</div>
-                  </div>
-                </div>
+  <!-- ✅ contenedor necesario para renderLoans -->
+  <div class="movements-list" id="loans-list" style="max-height: 220px;"></div>
+</section>
 
-                <div class="movement">
-                  <div>
-                    <p class="movement-concept">
-                      <b>Préstamo rápido</b> · Portátil
-                    </p>
-                    <p class="movement-date">
-                      Inicio: 2025-06-15 · Plazo: 12 meses
-                    </p>
-                  </div>
-                  <div style="text-align: right;">
-                    <div class="movement-amount">89,10 €/mes</div>
-                    <div class="movement-date">Pendiente: 420,00 €</div>
-                  </div>
-                </div>
-              </div>
-    <!--
-              <div class="panel-footer">
-                <button class="ghost-btn" id="download-contract">
-                  Descargar contrato (demo)
-                </button>
-              </div>-->
-            </section>
-          </div>
-        </div>
-      </main>
+<!-- Reutilizables -->
+<script src="/MenuIzquierdo/MenuIzquierdo.js"></script>
+<script src="/ParaTi/ParaTi.js"></script>
 
-      <!-- ANUNCIOS DERECHA (reutilizables) -->
-      <div id="right-rail-container"></div>
-    </div>
-
-     <!-- Reutilizables -->
-    <script src="/MenuIzquierdo/MenuIzquierdo.js"></script>
-    <script src="/ParaTi/ParaTi.js"></script>
-
-    <!-- JS de esta página -->
-    <script src="/Prestamos/Prestamos.js"></script>
-
-    <!-- Nombre del usuario -->
-    <script>
-      const stored = localStorage.getItem("userName");
-      document.getElementById("user-name").textContent = stored || "Jorge";
-    </script>
-  </body>
-</html>
+<!-- ✅ JS de esta página (sin /public) -->
+<script src="/Prestamos/Prestamos.js"></script>

@@ -1,20 +1,24 @@
-// /Prestamos/Prestamos.js
+// Prestamos/Prestamos.js
+console.log("✅ Prestamos.js cargado");
 
 function formatEUR(n) {
   return new Intl.NumberFormat("es-ES", {
     style: "currency",
     currency: "EUR",
-  }).format(n);
+  }).format(Number(n || 0));
 }
 
 // Cálculo cuota: sistema francés
 function monthlyPayment(principal, months, annualRate) {
-  const r = annualRate / 100 / 12; // tasa mensual
-  if (r === 0) return principal / months;
-  return (
-    (principal * (r * Math.pow(1 + r, months))) /
-    (Math.pow(1 + r, months) - 1)
-  );
+  const P = Number(principal || 0);
+  const M = Number(months || 0);
+  const R = Number(annualRate || 0);
+
+  if (!M) return 0;
+
+  const r = R / 100 / 12; // tasa mensual
+  if (r === 0) return P / M;
+  return (P * (r * Math.pow(1 + r, M))) / (Math.pow(1 + r, M) - 1);
 }
 
 function setText(id, value) {
@@ -47,6 +51,26 @@ function renderLoans(loans) {
   const list = document.getElementById("loans-list");
   if (!list) return;
 
+  // helper local (no dependas de escapeHtml externo)
+  const safe = (v) =>
+    String(v ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+
+  const statusLabel = (s) => {
+    const st = String(s || "");
+    if (st === "APPROVED") return "Aprobado ✅";
+    if (st === "PENDING") return "Pendiente ⏳";
+    if (st === "REJECTED") return "Denegado ❌";
+    if (st === "CANCELLED") return "Cancelado";
+    if (st === "ACTIVE") return "Activo ✅";
+    if (st === "CLOSED") return "Cerrado";
+    return st || "—";
+  };
+
   list.innerHTML = "";
 
   if (!Array.isArray(loans) || loans.length === 0) {
@@ -61,18 +85,41 @@ function renderLoans(loans) {
     return;
   }
 
+  console.log("LOANS (API) ->", loans);
+
   loans.forEach((l) => {
-    const start = l.startDate ? isoDate(l.startDate) : isoDate(l.createdAt);
-    const concept = (l.concept || "Préstamo").trim();
-    const months = Number(l.months || 0);
-    const fee = Number(l.monthlyFee || 0);
-    const remaining = Number(l.remaining ?? l.totalToPay ?? 0);
+    // ✅ tu modelo usa startedAt (y si no existe, createdAt)
+    const start = l.startedAt ? isoDate(l.startedAt) : isoDate(l.createdAt);
+
+    // ✅ tu modelo usa purpose (fallbacks por si acaso)
+    const concept =
+      String(l.purpose ?? l.concept ?? l.title ?? l.name ?? "").trim() ||
+      "Préstamo";
+
+    const months = Number(l.months ?? 0);
+
+    // ✅ tu modelo usa monthlyPayment
+    let fee = Number(l.monthlyPayment ?? l.monthlyFee ?? 0);
+
+    // ✅ si no viene cuota, la calculamos con amount + months + interestAPR
+    const apr = Number(l.interestAPR ?? l.apr ?? l.interestRate ?? 0);
+    const amount = Number(l.amount ?? l.principal ?? 0);
+
+    if ((!fee || fee === 0) && amount > 0 && months > 0) {
+      fee = monthlyPayment(amount, months, apr);
+    }
+
+    // ✅ tu modelo usa remainingToPay
+    const remaining = Number(
+      l.remainingToPay ?? l.remaining ?? l.totalToPay ?? l.total ?? amount ?? 0
+    );
 
     list.innerHTML += `
       <div class="movement">
         <div>
           <p class="movement-concept">
-            <b>${l.status === "ACTIVE" ? "Préstamo activo" : "Préstamo"}</b> · ${concept}
+            <b>${safe(concept)}</b>
+            <span style="opacity:.75"> · ${safe(statusLabel(l.status))}</span>
           </p>
           <p class="movement-date">
             Inicio: ${start} · Plazo: ${months} meses
@@ -99,7 +146,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnApply = document.getElementById("open-apply");
   const btnCopy = document.getElementById("copy-simulation");
 
-  // ===== MODAL SOLICITUD (BONITO) =====
+  // Evita submit accidental si está dentro del form
+  if (btnApply) btnApply.setAttribute("type", "button");
+
+  // ===== MODAL SOLICITUD =====
   const loanOverlay = document.getElementById("loan-overlay");
   const loanForm = document.getElementById("loan-form");
   const loanCancel = document.getElementById("loan-cancel");
@@ -133,42 +183,46 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===== BACKEND calls =====
-  async function requestLoan({ amount, months, apr, concept }) {
+  async function requestLoan({ amount, months, apr, purpose }) {
+    // ✅ tu backend/modelo usa "purpose" e "interestAPR" (tu controller puede mapear apr a interestAPR)
     const res = await fetch("/loans/request", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
-      body: JSON.stringify({ amount, months, apr, concept }),
+      body: JSON.stringify({ amount, months, apr, purpose }),
     });
 
     const data = await res.json().catch(() => null);
-    if (!res.ok) {
-      throw new Error(data?.message || "Error solicitando préstamo");
-    }
+    if (!res.ok) throw new Error(data?.message || "Error solicitando préstamo");
     return data;
   }
 
   async function loadMyLoans() {
-    const res = await fetch("/loans/my", {
+    const res = await fetch("/loans/mine", {
       headers: { Authorization: "Bearer " + token },
     });
 
     const data = await res.json().catch(() => null);
-    if (!res.ok) {
-      throw new Error(data?.message || "Error cargando préstamos");
-    }
-    return data.loans || [];
+    if (!res.ok) throw new Error(data?.message || "Error cargando préstamos");
+    return data?.loans || [];
   }
 
   async function refreshLoans() {
     try {
       const loans = await loadMyLoans();
-      renderLoans(loans);
+
+      // ✅ “Activos” = aprobados/activos (tu modelo usa APPROVED)
+      const activeLoans = loans.filter(
+        (l) => l?.status === "APPROVED" || l?.status === "ACTIVE"
+      );
+
+      renderLoans(activeLoans);
     } catch (e) {
       console.error(e);
       setMessage(e.message || "No se pudieron cargar tus préstamos.", "error");
+      renderLoans([]);
     }
   }
 
@@ -201,7 +255,6 @@ document.addEventListener("DOMContentLoaded", () => {
       setText("result-total", formatEUR(total));
       setText("result-interest", formatEUR(interest));
 
-      // (si existen en tu HTML)
       setText("quick-fee", formatEUR(fee));
       setText("quick-total", formatEUR(total));
 
@@ -210,7 +263,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===== PEDIR PRÉSTAMO =====
-  // 1) botón abre modal si simulación es válida
   if (btnApply) {
     btnApply.addEventListener("click", () => {
       const amount = Number(document.getElementById("loan-amount")?.value);
@@ -236,12 +288,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 2) submit del modal envía solicitud
   loanForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const concept = (loanConceptInput?.value || "").trim();
-    if (!concept) {
+    const purpose = (loanConceptInput?.value || "").trim();
+    if (!purpose) {
       setMessage("Introduce un concepto para el préstamo.", "error");
       return;
     }
@@ -252,7 +303,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       setMessage("Enviando solicitud...", "info");
-      await requestLoan({ amount, months, apr, concept });
+
+      // ✅ enviamos "purpose" al backend (tu schema lo guarda así)
+      await requestLoan({ amount, months, apr, purpose });
 
       closeLoanModal();
       setMessage("Solicitud enviada ✅ (pendiente de aprobación)", "success");

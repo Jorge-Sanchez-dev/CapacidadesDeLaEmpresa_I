@@ -15,7 +15,8 @@ async function loadDashboard(token) {
   if (!kpisEl || !recentEl) return;
 
   try {
-    const res = await fetch("/admin/dashboard", {
+    // ✅ API admin bajo /api/admin
+    const res = await fetch("/api/admin/dashboard", {
       headers: { Authorization: "Bearer " + token },
     });
 
@@ -71,7 +72,6 @@ async function loadDashboard(token) {
       const fromName = m.from?.name || "—";
       const toName = m.to?.name || "—";
 
-      // si quieres mostrar IBAN cuando exista
       const fromIban = m.from?.iban ? ` (${m.from.iban})` : "";
       const toIban = m.to?.iban ? ` (${m.to.iban})` : "";
 
@@ -117,7 +117,8 @@ async function loadUsers(token) {
   if (!list) return;
 
   try {
-    const res = await fetch("/admin/users", {
+    // ✅ API admin bajo /api/admin
+    const res = await fetch("/api/admin/users", {
       headers: { Authorization: "Bearer " + token },
     });
 

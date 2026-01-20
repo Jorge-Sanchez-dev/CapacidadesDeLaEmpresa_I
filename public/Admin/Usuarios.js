@@ -1,7 +1,7 @@
 // /Admin/Usuarios.js
 
 // ✅ CAMBIA SOLO ESTO si tu backend está montado en /api/admin
-const API_BASE = "/admin"; // o "/api/admin"
+const API_BASE = "/api/admin"; // o "/api/admin"
 
 document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("token");

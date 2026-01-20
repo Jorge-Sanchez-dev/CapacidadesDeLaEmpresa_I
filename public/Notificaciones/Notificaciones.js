@@ -49,7 +49,7 @@ async function loadNotifications(token) {
           <div>
             <h2 style="margin-bottom:6px;">${escapeHtml(n.title || "Notificación")}</h2>
             <div style="opacity:.85; margin-bottom:8px;">${escapeHtml(n.message || "")}</div>
-            <div style="opacity:.65; font-size:.92rem;">${pretty} · ${escapeHtml(n.type || "INFO")}</div>
+            <div style="opacity:.65; font-size:.92rem;">${pretty} </div>
           </div>
 
           <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end; min-width:120px;">

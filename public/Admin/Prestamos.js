@@ -1,5 +1,9 @@
 // public/Admin/Prestamos.js
 
+// ✅ Prefijos de API (cambia aquí y se arregla todo)
+const API_ADMIN = "/api/admin"; // <- admin API nueva
+const API_LOANS = "/loans";     // <- tus loans están montados en /loans (si los pasas a /api/loans, cambia aquí)
+
 document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -25,10 +29,11 @@ async function loadLoans(token) {
   list.innerHTML = `<div class="info-card"><h2>Cargando...</h2></div>`;
 
   try {
-    // ✅ LISTADO: se queda en /admin/loans (tu bandeja admin)
-    const res = await fetch(`/admin/loans?status=${encodeURIComponent(status)}`, {
-      headers: { Authorization: "Bearer " + token },
-    });
+    // ✅ LISTADO: ahora en /api/admin/loans (evita conflicto con /Admin/Admin.html)
+    const res = await fetch(
+      `${API_ADMIN}/loans?status=${encodeURIComponent(status)}`,
+      { headers: { Authorization: "Bearer " + token } }
+    );
 
     const text = await res.text();
     let data = null;
@@ -59,7 +64,6 @@ async function loadLoans(token) {
       const card = document.createElement("section");
       card.className = "info-card";
 
-      // En tu backend admin estás devolviendo applicant poblado
       const applicant = l.applicant || {};
       const fullName =
         `${applicant.name || ""} ${applicant.surname || ""}`.trim() || "—";
@@ -152,7 +156,6 @@ async function loadLoans(token) {
 }
 
 function openDecisionModal(token, loanId, action) {
-  // ✅ Si no existe, lo creamos (por si el HTML no lo trae)
   let root = document.getElementById("modal-root");
   if (!root) {
     root = document.createElement("div");
@@ -220,8 +223,8 @@ function openDecisionModal(token, loanId, action) {
       if (isApprove) {
         const apr = Number(overlay.querySelector("#apr")?.value || 6);
 
-        // ✅ CAMBIO CLAVE: decide unificado
-        const res = await fetch(`/loans/${loanId}/decide`, {
+        // ✅ DECIDIR: tu endpoint actual está en /loans/:id/decide
+        const res = await fetch(`${API_LOANS}/${loanId}/decide`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -232,9 +235,7 @@ function openDecisionModal(token, loanId, action) {
 
         const text = await res.text();
         let data = null;
-        try {
-          data = JSON.parse(text);
-        } catch {}
+        try { data = JSON.parse(text); } catch {}
 
         console.log("APPROVE response:", res.status, data || text);
 
@@ -244,8 +245,8 @@ function openDecisionModal(token, loanId, action) {
       } else {
         const reason = String(overlay.querySelector("#reason")?.value || "");
 
-        // ✅ CAMBIO CLAVE: decide unificado
-        const res = await fetch(`/loans/${loanId}/decide`, {
+        // ✅ DECIDIR: tu endpoint actual está en /loans/:id/decide
+        const res = await fetch(`${API_LOANS}/${loanId}/decide`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -256,9 +257,7 @@ function openDecisionModal(token, loanId, action) {
 
         const text = await res.text();
         let data = null;
-        try {
-          data = JSON.parse(text);
-        } catch {}
+        try { data = JSON.parse(text); } catch {}
 
         console.log("REJECT response:", res.status, data || text);
 
