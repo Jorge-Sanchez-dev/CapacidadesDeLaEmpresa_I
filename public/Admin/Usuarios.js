@@ -235,16 +235,61 @@ function openEditModal(u, token) {
   overlay.querySelector("#ed-cancel").addEventListener("click", close);
 
   overlay.querySelector("#ed-save").addEventListener("click", async () => {
-    const payload = {
-      name: overlay.querySelector("#ed-name").value,
-      surname: overlay.querySelector("#ed-surname").value,
-      email: overlay.querySelector("#ed-email").value,
-      phone: overlay.querySelector("#ed-phone").value,
-      role: overlay.querySelector("#ed-role").value,
-    };
-
     const msg = overlay.querySelector("#ed-msg");
     const dbg = overlay.querySelector("#ed-debug");
+
+    // ✅ Normalización mínima
+    const name = String(overlay.querySelector("#ed-name").value || "").trim();
+    const surname = String(overlay.querySelector("#ed-surname").value || "").trim();
+    const email = String(overlay.querySelector("#ed-email").value || "").trim().toLowerCase();
+    const phone = String(overlay.querySelector("#ed-phone").value || "").trim().replace(/\s+/g, "");
+    const role = String(overlay.querySelector("#ed-role").value || "USER");
+
+    // ✅ VALIDACIONES (EMAIL + TELÉFONO)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[67][0-9]{8}$/; // 9 dígitos y empieza por 6 o 7
+
+    if (!email) {
+      msg.textContent = "El email es obligatorio.";
+      return;
+    }
+    if (!emailRegex.test(email)) {
+      msg.textContent = "Formato de email no válido.";
+      return;
+    }
+
+    // teléfono: si lo quieres obligatorio, deja esta validación tal cual.
+    // Si lo quieres opcional, cambia a: if (phone && !phoneRegex.test(phone)) ...
+    if (!phone) {
+      msg.textContent = "El teléfono es obligatorio.";
+      return;
+    }
+    if (!phoneRegex.test(phone)) {
+      msg.textContent = "Teléfono no válido (debe empezar por 6 o 7 y tener 9 dígitos).";
+      return;
+    }
+
+    // ✅ Evitar petición si no hay cambios (extra útil)
+    const originalEmail = String(u.email || "").trim().toLowerCase();
+    const originalPhone = String(u.phone || "").trim().replace(/\s+/g, "");
+    const originalName = String(u.name || "").trim();
+    const originalSurname = String(u.surname || "").trim();
+    const originalRole = String(u.role || "USER");
+
+    const noChanges =
+      name === originalName &&
+      surname === originalSurname &&
+      email === originalEmail &&
+      phone === originalPhone &&
+      role === originalRole;
+
+    if (noChanges) {
+      msg.textContent = "No hay cambios para guardar.";
+      return;
+    }
+
+    const payload = { name, surname, email, phone, role };
+
     msg.textContent = "Guardando...";
     dbg.textContent = "";
 
@@ -261,7 +306,7 @@ function openEditModal(u, token) {
 
       const body = await readBody(res);
 
-      // ✅ Debug visible (para cazar 401/403/404/500 sin llorar)
+      // ✅ Debug visible
       dbg.textContent = `Status: ${res.status} · ${url}`;
 
       console.log("PUT user:", res.status, url, body);
@@ -314,11 +359,9 @@ async function readBody(res) {
     return await res.json().catch(() => null);
   }
 
-  // texto/html etc.
   const text = await res.text().catch(() => "");
   if (!text) return null;
 
-  // por si viene JSON con content-type mal puesto
   try {
     return JSON.parse(text);
   } catch {
