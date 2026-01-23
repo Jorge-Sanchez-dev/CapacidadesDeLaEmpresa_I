@@ -27,7 +27,7 @@ async function loadNotifications(token) {
 
     const notifs = data.notifications || [];
     if (notifs.length === 0) {
-      list.innerHTML = `<div class="info-card"><h2>Sin notificaciones</h2><div style="opacity:.8">Todo tranquilo por aquí 😄</div></div>`;
+      list.innerHTML = `<div class="info-card"><h2>Sin notificaciones</h2><div style="opacity:.8">No existen notificaciones aún.</div></div>`;
       return;
     }
 

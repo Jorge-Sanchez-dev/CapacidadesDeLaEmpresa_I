@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ========================
-  // REGISTRO (déjalo igual)
+  // REGISTRO
   // ========================
   const registerForm = document.getElementById("register-form");
   if (registerForm) {

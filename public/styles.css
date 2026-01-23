@@ -1078,3 +1078,7 @@ h1 {
   margin-left: 0 !important;
   word-break: break-word;
 }
+
+.select-wrapper {
+  margin-bottom: 16px; /* mismo espacio que los inputs */
+}

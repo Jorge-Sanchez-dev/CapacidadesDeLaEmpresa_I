@@ -17,11 +17,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const transferForm = document.getElementById("transfer-form");
   const transferMsg = document.getElementById("transfer-message");
 
+  // ✅ Si venimos de un reload tras transferencia, re-mostramos el mensaje
+  if (transferMsg && sessionStorage.getItem("transfer_ok") === "1") {
+    transferMsg.textContent = "Transferencia realizada ✅";
+    sessionStorage.removeItem("transfer_ok");
+  }
+
   // ----- FORMULARIO DE TRANSFERENCIA -----
   if (transferForm) {
     transferForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      if (transferMsg) transferMsg.textContent = "";
+
+      if (transferMsg) {
+        transferMsg.textContent = "Enviando transferencia...";
+      }
 
       const toIbanInput = document.getElementById("to-iban");
       const amountInput = document.getElementById("amount");
@@ -56,17 +65,16 @@ document.addEventListener("DOMContentLoaded", () => {
           // si el backend responde con error (400/401/404/500...)
           if (!res.ok) {
             const msg =
-              (data && data.message) ||
-              "Error al hacer la transferencia";
+              (data && data.message) || "Error al hacer la transferencia";
             throw new Error(msg);
           }
 
           return data;
         })
-        .then((data) => {
-          if (transferMsg) {
-            transferMsg.textContent = "Transferencia realizada ✅";
-          }
+        .then(() => {
+          // ✅ Guardamos flag para que, tras el reload, el mensaje siga viéndose
+          sessionStorage.setItem("transfer_ok", "1");
+
           // refrescar saldo y movimientos
           window.location.reload();
         })
@@ -91,10 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!res.ok) {
         console.error("Error en /auth/dashboard:", data);
-        throw new Error(
-          (data && data.message) ||
-            "No se ha podido cargar el panel"
-        );
+        throw new Error((data && data.message) || "No se ha podido cargar el panel");
       }
 
       return data;
@@ -117,9 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
               ? account.balance
               : Number(account.balance || 0);
           const saldo = rawBalance.toFixed(2).replace(".", ",");
-          balanceAmountEl.textContent = `${saldo} ${
-            account.currency || ""
-          }`;
+          balanceAmountEl.textContent = `${saldo} ${account.currency || ""}`;
         }
 
         if (balanceIbanEl) {
@@ -139,6 +142,9 @@ document.addEventListener("DOMContentLoaded", () => {
         listaMovimientos
       ) {
         if (noMovements) noMovements.style.display = "none";
+
+        // ✅ Por si recargas y se duplican (depende de tu HTML), limpia antes:
+        listaMovimientos.innerHTML = "";
 
         movements.forEach((mov) => {
           const movDiv = document.createElement("div");
@@ -193,6 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
           listaMovimientos.appendChild(movDiv);
         });
       } else if (noMovements) {
+        if (listaMovimientos) listaMovimientos.innerHTML = "";
         noMovements.style.display = "block";
       }
     })

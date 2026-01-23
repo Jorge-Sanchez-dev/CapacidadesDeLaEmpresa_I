@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -8,7 +8,11 @@
   <body class="home-body">
     <div class="home-wrapper">
       <header class="home-header">
-        <img src="/logo sin fondo.png" alt="Banco Sánchez" class="logo" />
+        <img
+          src="/photos/logo%20sin%20fondo.png"
+          alt="Banco Sánchez"
+          class="brand-logo"
+        />
         <h1>Crear cuenta</h1>
       </header>
 
@@ -24,12 +28,12 @@
             <input type="date" id="birthDate" required />
 
             <input type="text" id="dni" placeholder="DNI" required />
-            <input
-              type="text"
-              id="country"
-              placeholder="País de residencia"
-              required
-            />
+            <div class="select-wrapper">
+              <select id="country" required>
+                <option value="">País de residencia</option>
+                <option value="ES">España</option>
+              </select>
+            </div>
 
             <input type="text" id="city" placeholder="Ciudad" required />
           </div>

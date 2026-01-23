@@ -6,6 +6,33 @@ import Account from "../models/Account";
 import { Request, Response } from "express";
 import Transfer from "../models/Transfer";
 import Bizum from "../models/Bizum";
+import { validateLocation } from "../utils/locations";
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{9,}$/;
+// min 9 caracteres, mayúscula, minúscula, número y símbolo
+
+const dniRegex = /^[0-9]{8}[A-Z]$/;
+
+const phoneRegex = /^[67][0-9]{8}$/; // empieza por 6 o 7 y 9 dígitos
+
+function isAdult(birthDate: string): boolean {
+  const birth = new Date(birthDate);
+  const today = new Date();
+
+  if (isNaN(birth.getTime())) return false;
+  if (birth >= today) return false;
+
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+
+  return age >= 18;
+}
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -31,20 +58,91 @@ export const register = async (req: Request, res: Response) => {
       mainCurrency,
     } = req.body;
 
-    // ✅ ejemplo mínimo de validación (ajusta a lo tuyo)
-    if (!email || !password || !name) {
-      return res.status(400).json({ message: "Datos incompletos" });
+    /* =========================
+       VALIDACIONES OBLIGATORIAS
+       ========================= */
+
+    if (
+      !name ||
+      !surname ||
+      !birthDate ||
+      !dni ||
+      !email ||
+      !phone ||
+      !password
+    ) {
+      return res.status(400).json({
+        message: "Faltan datos obligatorios",
+      });
     }
 
-    // ✅ evitar email duplicado
-    const exists = await User.findOne({ email }).lean();
-    if (exists) {
-      return res.status(400).json({ message: "El email ya está registrado" });
+    // 📧 Email
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        message: "Formato de email no válido",
+      });
     }
+
+    // 🔐 Password fuerte
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "La contraseña debe tener al menos 9 caracteres, una mayúscula, una minúscula, un número y un símbolo",
+      });
+    }
+
+    // 🆔 DNI español
+    if (!dniRegex.test(dni)) {
+      return res.status(400).json({
+        message: "DNI no válido (8 números y una letra)",
+      });
+    }
+
+    // 🎂 Fecha de nacimiento
+    if (!isAdult(birthDate)) {
+      return res.status(400).json({
+        message: "Debes ser mayor de edad y la fecha debe ser anterior a hoy",
+      });
+    }
+
+    // 📍 Validación de país, ciudad y código postal
+    const locationError = validateLocation(country, city, postalCode);
+    if (locationError) {
+      return res.status(400).json({ message: locationError });
+    }
+
+    // 📱 Teléfono
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({
+        message: "El teléfono debe empezar por 6 o 7 y tener 9 dígitos",
+      });
+    }
+
+    /* =========================
+       COMPROBACIONES DE DUPLICADOS
+       ========================= */
+
+    const emailExists = await User.findOne({ email }).lean();
+    if (emailExists) {
+      return res.status(400).json({
+        message: "El email ya está registrado",
+      });
+    }
+
+    const dniExists = await User.findOne({ dni }).lean();
+    if (dniExists) {
+      return res.status(400).json({
+        message: "El DNI ya está registrado",
+      });
+    }
+
+    /* =========================
+       CREACIÓN DE USUARIO
+       ========================= */
 
     const hashed = await bcrypt.hash(password, 10);
 
-    // ✅ PRIMER USER = ADMIN, resto = USER
+    // Primer usuario = ADMIN
     const existingAdmin = await User.findOne({ role: "ADMIN" }).lean();
     const roleToAssign = existingAdmin ? "USER" : "ADMIN";
 
@@ -61,10 +159,13 @@ export const register = async (req: Request, res: Response) => {
       phone,
       password: hashed,
       mainCurrency,
-      role: roleToAssign, // ✅ AÑADIDO
+      role: roleToAssign,
     });
 
-    // 👉 Crear una cuenta vacía asociada a este usuario
+    /* =========================
+       CREACIÓN DE CUENTA NÓMINA
+       ========================= */
+
     const timestamp = Date.now().toString().slice(-10);
     const fakeAccountNumber = "0000" + timestamp;
     const fakeIban = `ES12 1111 2222 ${timestamp.slice(-4)}`;
@@ -88,12 +189,14 @@ export const register = async (req: Request, res: Response) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: (user as any).role,
+        role: roleToAssign,
       },
     });
   } catch (err) {
     console.error("Error en register:", err);
-    return res.status(500).json({ message: "Error en el servidor" });
+    return res.status(500).json({
+      message: "Error en el servidor",
+    });
   }
 };
 

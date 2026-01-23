@@ -40,41 +40,39 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  /* ---------- SALUDO ---------- */
+  /* ---------- DOM ---------- */
   const greetingEl = document.getElementById("greeting");
-
-  fetch("/auth/dashboard", {
-    headers: { Authorization: "Bearer " + token },
-  })
-    .then(async (res) => {
-      const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.message || "Error usuario");
-      return data;
-    })
-    .then((data) => {
-      if (data?.user?.name && greetingEl) {
-        greetingEl.textContent = `Hola, ${data.user.name} 👋`;
-      }
-    })
-    .catch(console.error);
-
-  /* ---------- HELPERS ---------- */
   const grid = document.getElementById("cards-grid");
   const count = document.getElementById("cards-count");
 
+  // ✅ saldo real de la cuenta del usuario (del dashboard)
+  let dashboardBalance = 0;
+
+  /* ---------- HELPERS ---------- */
   function authHeaders(extra = {}) {
     return { Authorization: "Bearer " + token, ...extra };
   }
 
   function formatEUR(n) {
+    const num = typeof n === "number" ? n : Number(n || 0);
     return new Intl.NumberFormat("es-ES", {
       style: "currency",
       currency: "EUR",
-    }).format(n);
+    }).format(num);
   }
 
   function formatExpiry(m, y) {
     return `${String(m).padStart(2, "0")}/${String(y).padStart(2, "0")}`;
+  }
+
+  /* ---------- FETCH DASHBOARD (para saludo + saldo real) ---------- */
+  async function fetchDashboard() {
+    const res = await fetch("/auth/dashboard", {
+      headers: { Authorization: "Bearer " + token },
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(data?.message || "Error usuario");
+    return data;
   }
 
   /* ---------- FETCH CARDS ---------- */
@@ -95,10 +93,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const el = document.createElement("section");
       el.className = "info-card";
 
+      // ✅ CLAVE: para DEBIT mostramos el balance REAL del dashboard
       const shownMoney =
-        c.cardType === "DEBIT"
-          ? (c.account?.balance ?? 0)
-          : (c.creditLimit ?? 0);
+        c.cardType === "DEBIT" ? dashboardBalance : (c.creditLimit ?? 0);
 
       el.innerHTML = `
         <div style="display:flex; justify-content:space-between; gap:12px;">
@@ -244,7 +241,6 @@ document.addEventListener("DOMContentLoaded", () => {
       closeTypeModal();
       await createCard({ alias: "Débito Pro", cardType: "DEBIT" });
     } else {
-      // “otra pantalla” sin salir: modal 2
       closeTypeModal();
       openCreditModal();
     }
@@ -280,9 +276,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ✅ INIT
-  loadAndRender().catch((err) => {
-    console.error(err);
-    showModal(err.message || "Error cargando tarjetas", "Tarjetas");
-  });
+  /* =========================
+     ✅ INIT (orden correcto)
+     ========================= */
+  (async () => {
+    try {
+      const data = await fetchDashboard();
+
+      // saludo
+      if (data?.user?.name && greetingEl) {
+        greetingEl.textContent = `Hola, ${data.user.name} 👋`;
+      }
+
+      // saldo real: data.account.balance (en tu BD es "balance")
+      const rawBal = data?.account?.balance;
+      dashboardBalance =
+        typeof rawBal === "number" ? rawBal : Number(rawBal || 0);
+
+      // ahora sí, render tarjetas (ya con saldo cargado)
+      await loadAndRender();
+    } catch (err) {
+      console.error(err);
+      showModal(err.message || "Error cargando tarjetas", "Tarjetas");
+    }
+  })();
 });
