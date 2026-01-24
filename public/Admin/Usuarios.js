@@ -1,3 +1,4 @@
+// /Admin/Usuarios.js
 const API_BASE = "/api/admin";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -6,6 +7,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = "/login.html";
     return;
   }
+
+  // ✅ (Opcional) añade estilos solo para el resumen de movimientos del Admin
+  injectAdminMovementStyles();
 
   await loadUsers(token);
 
@@ -43,7 +47,9 @@ async function loadUsers(token) {
 }
 
 function filterUsers() {
-  const q = (document.getElementById("search")?.value || "").toLowerCase().trim();
+  const q = (document.getElementById("search")?.value || "")
+    .toLowerCase()
+    .trim();
 
   const filtered = ALL_USERS.filter((u) => {
     const name = `${u.name || ""} ${u.surname || ""}`.toLowerCase();
@@ -89,12 +95,12 @@ function renderUsers(users, token) {
       <div id="summary-${u._id}" style="display:none; margin-top:12px;"></div>
     `;
 
-    card.querySelector('[data-action="summary"]').addEventListener("click", () =>
-      toggleSummary(u._id, token)
-    );
-    card.querySelector('[data-action="edit"]').addEventListener("click", () =>
-      openEditModal(u, token)
-    );
+    card
+      .querySelector('[data-action="summary"]')
+      .addEventListener("click", () => toggleSummary(u._id, token));
+    card
+      .querySelector('[data-action="edit"]')
+      .addEventListener("click", () => openEditModal(u, token));
 
     list.appendChild(card);
   });
@@ -131,10 +137,18 @@ async function toggleSummary(userId, token) {
         ${
           acc
             ? `
-              <div class="info-line"><span>IBAN</span><span class="info-value">${escapeHtml(acc.iban || "—")}</span></div>
-              <div class="info-line"><span>Saldo</span><span class="info-value">${formatMoney(acc.balance || 0)}</span></div>
-              <div class="info-line"><span>Moneda</span><span class="info-value">${escapeHtml(acc.currency || "—")}</span></div>
-              <div class="info-line"><span>Estado</span><span class="info-value">${escapeHtml(acc.status || "—")}</span></div>
+              <div class="info-line"><span>IBAN</span><span class="info-value">${escapeHtml(
+                acc.iban || "—"
+              )}</span></div>
+              <div class="info-line"><span>Saldo</span><span class="info-value">${formatMoney(
+                acc.balance || 0
+              )}</span></div>
+              <div class="info-line"><span>Moneda</span><span class="info-value">${escapeHtml(
+                acc.currency || "—"
+              )}</span></div>
+              <div class="info-line"><span>Estado</span><span class="info-value">${escapeHtml(
+                acc.status || "—"
+              )}</span></div>
             `
             : `<div style="opacity:.8">Este usuario no tiene cuenta principal activa.</div>`
         }
@@ -156,21 +170,43 @@ async function toggleSummary(userId, token) {
   }
 }
 
+/**
+ * ✅ CORREGIDO:
+ * - separa icono/dirección/fecha/importe en spans distintos
+ * - usa flex + gap (inyectado por injectAdminMovementStyles)
+ * - evita que el emoji “pise” la fecha
+ */
 function renderMovements(movs) {
-  if (!movs || movs.length === 0) return `<div style="opacity:.8">Sin movimientos.</div>`;
+  if (!movs || movs.length === 0)
+    return `<div style="opacity:.8">Sin movimientos.</div>`;
 
   return movs
     .map((m) => {
       const d = m.date ? new Date(m.date) : new Date();
       const pretty = isNaN(d.getTime()) ? "—" : d.toLocaleString("es-ES");
-      const dir = m.direction === "IN" ? "⬅️ IN" : m.direction === "OUT" ? "➡️ OUT" : "—";
+
+      const type = m.type || "MOV";
+      const direction =
+        m.direction === "IN" ? "IN" : m.direction === "OUT" ? "OUT" : "—";
+      const arrow =
+        direction === "IN" ? "⬅️" : direction === "OUT" ? "➡️" : "•";
 
       return `
-        <div class="info-line">
-          <span>${escapeHtml(m.type || "MOV")} · ${dir}</span>
-          <span class="info-value">${pretty} · ${formatMoney(m.amount || 0)}</span>
+        <div class="admin-mov-item">
+          <div class="admin-mov-top">
+            <span class="admin-mov-type">${escapeHtml(type)}</span>
+            <span class="admin-mov-dir">${arrow}</span>
+            <span class="admin-mov-dirtext">${escapeHtml(direction)}</span>
+
+            <span class="admin-mov-right">
+              <span class="admin-mov-date">${escapeHtml(pretty)}</span>
+              <span class="admin-mov-sep">·</span>
+              <span class="admin-mov-amt">${formatMoney(m.amount || 0)}</span>
+            </span>
+          </div>
+
+          <div class="admin-mov-concept">${escapeHtml(m.concept || "—")}</div>
         </div>
-        <div style="opacity:.85; margin: 6px 0 12px 0;">${escapeHtml(m.concept || "—")}</div>
       `;
     })
     .join("");
@@ -195,17 +231,29 @@ function openEditModal(u, token) {
     <div class="info-card" style="width:min(720px, 92vw);">
       <h2>Editar usuario</h2>
 
-      <div class="info-line"><span>Nombre</span><span class="info-value"><input id="ed-name" value="${escapeAttr(u.name || "")}" style="width:260px;" /></span></div>
-      <div class="info-line"><span>Apellidos</span><span class="info-value"><input id="ed-surname" value="${escapeAttr(u.surname || "")}" style="width:260px;" /></span></div>
-      <div class="info-line"><span>Email</span><span class="info-value"><input id="ed-email" value="${escapeAttr(u.email || "")}" style="width:260px;" /></span></div>
-      <div class="info-line"><span>Teléfono</span><span class="info-value"><input id="ed-phone" value="${escapeAttr(u.phone || "")}" style="width:260px;" /></span></div>
+      <div class="info-line"><span>Nombre</span><span class="info-value"><input id="ed-name" value="${escapeAttr(
+        u.name || ""
+      )}" style="width:260px;" /></span></div>
+      <div class="info-line"><span>Apellidos</span><span class="info-value"><input id="ed-surname" value="${escapeAttr(
+        u.surname || ""
+      )}" style="width:260px;" /></span></div>
+      <div class="info-line"><span>Email</span><span class="info-value"><input id="ed-email" value="${escapeAttr(
+        u.email || ""
+      )}" style="width:260px;" /></span></div>
+      <div class="info-line"><span>Teléfono</span><span class="info-value"><input id="ed-phone" value="${escapeAttr(
+        u.phone || ""
+      )}" style="width:260px;" /></span></div>
 
       <div class="info-line">
         <span>Rol</span>
         <span class="info-value">
           <select id="ed-role">
-            <option value="USER" ${String(u.role || "USER") === "USER" ? "selected" : ""}>USER</option>
-            <option value="ADMIN" ${String(u.role || "USER") === "ADMIN" ? "selected" : ""}>ADMIN</option>
+            <option value="USER" ${
+              String(u.role || "USER") === "USER" ? "selected" : ""
+            }>USER</option>
+            <option value="ADMIN" ${
+              String(u.role || "USER") === "ADMIN" ? "selected" : ""
+            }>ADMIN</option>
           </select>
         </span>
       </div>
@@ -236,9 +284,15 @@ function openEditModal(u, token) {
     const dbg = overlay.querySelector("#ed-debug");
 
     const name = String(overlay.querySelector("#ed-name").value || "").trim();
-    const surname = String(overlay.querySelector("#ed-surname").value || "").trim();
-    const email = String(overlay.querySelector("#ed-email").value || "").trim().toLowerCase();
-    const phone = String(overlay.querySelector("#ed-phone").value || "").trim().replace(/\s+/g, "");
+    const surname = String(
+      overlay.querySelector("#ed-surname").value || ""
+    ).trim();
+    const email = String(overlay.querySelector("#ed-email").value || "")
+      .trim()
+      .toLowerCase();
+    const phone = String(overlay.querySelector("#ed-phone").value || "")
+      .trim()
+      .replace(/\s+/g, "");
     const role = String(overlay.querySelector("#ed-role").value || "USER");
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -257,7 +311,8 @@ function openEditModal(u, token) {
       return;
     }
     if (!phoneRegex.test(phone)) {
-      msg.textContent = "Teléfono no válido (debe empezar por 6 o 7 y tener 9 dígitos).";
+      msg.textContent =
+        "Teléfono no válido (debe empezar por 6 o 7 y tener 9 dígitos).";
       return;
     }
 
@@ -318,7 +373,10 @@ function openEditModal(u, token) {
 
 function formatMoney(n) {
   const num = Number(n || 0);
-  return new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(num);
+  return new Intl.NumberFormat("es-ES", {
+    style: "currency",
+    currency: "EUR",
+  }).format(num);
 }
 
 function escapeHtml(str) {
@@ -360,4 +418,37 @@ function getMsg(body) {
   if (typeof body === "string") return body;
   if (body.message) return body.message;
   return "";
+}
+
+
+function injectAdminMovementStyles() {
+  if (document.getElementById("admin-mov-styles")) return;
+
+  const style = document.createElement("style");
+  style.id = "admin-mov-styles";
+  style.textContent = `
+    .admin-mov-item{ margin-top:10px; }
+    .admin-mov-top{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .admin-mov-right{
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .admin-mov-dir{
+      width:22px;
+      display:inline-flex;
+      justify-content:center;
+      flex:0 0 auto;
+    }
+    .admin-mov-type{ opacity:.8; letter-spacing:.02em; }
+    .admin-mov-concept{ opacity:.85; margin:6px 0 12px 0; }
+    .admin-mov-sep{ opacity:.7; }
+  `;
+  document.head.appendChild(style);
 }

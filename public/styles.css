@@ -1036,3 +1036,72 @@ h1 {
 .select-wrapper {
   margin-bottom: 16px;
 }
+
+.movement-meta{
+  display:flex;
+  align-items:center;
+  gap:10px;            /* separa icono/fecha */
+  flex-wrap:wrap;      /* si no cabe, que baje sin solapar */
+}
+
+.movement-dir{
+  display:inline-flex;
+  width:22px;          /* “reserva” el hueco del icono */
+  justify-content:center;
+  flex:0 0 auto;
+}
+
+/* Cabecera de cada movimiento: tipo + flecha + fecha + importe */
+.movement-meta,
+.movement-header,
+.movement-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Si usas un span para el icono */
+.movement-icon,
+.movement-dir {
+  flex: 0 0 auto;
+  width: 22px;           /* reserva hueco al emoji */
+  display: inline-flex;
+  justify-content: center;
+}
+
+.admin-mov-item{
+  margin-top: 10px;
+}
+
+.admin-mov-top{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.admin-mov-right{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.admin-mov-dir{
+  width:22px;
+  display:inline-flex;
+  justify-content:center;
+  flex:0 0 auto;
+}
+
+.admin-mov-type{
+  opacity:.8;
+  letter-spacing:.02em;
+}
+
+.admin-mov-concept{
+  opacity:.85;
+  margin: 6px 0 12px 0;
+}
+
