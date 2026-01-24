@@ -1,4 +1,3 @@
-
 console.log("✅ Prestamos.js cargado");
 
 function formatEUR(n) {
@@ -134,6 +133,37 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // ✅ NUEVO: pintar saludo como en Tarjetas
+  const greetingEl = document.getElementById("greeting");
+
+  async function fetchDashboard() {
+    const res = await fetch("/auth/dashboard", {
+      headers: { Authorization: "Bearer " + token },
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(data?.message || "Error usuario");
+    return data;
+  }
+
+  async function paintGreeting() {
+    if (!greetingEl) return;
+    try {
+      const data = await fetchDashboard();
+      const name =
+        data?.user?.name ||
+        data?.user?.nombre ||
+        data?.user?.firstName ||
+        "";
+      if (name) greetingEl.textContent = `Hola, ${name} 👋`;
+    } catch (e) {
+      // Si falla el saludo, no rompas la página
+      console.warn("No se pudo pintar el saludo:", e?.message || e);
+    }
+  }
+
+  // Dispara el saludo en paralelo (o lo puedes await si quieres)
+  paintGreeting();
+
   const form = document.getElementById("loan-sim-form");
   const btnApply = document.getElementById("open-apply");
   const btnCopy = document.getElementById("copy-simulation");
@@ -241,6 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setText("result-total", formatEUR(total));
       setText("result-interest", formatEUR(interest));
 
+      // Si estos IDs no existen en tu HTML, no pasa nada porque setText ya lo protege
       setText("quick-fee", formatEUR(fee));
       setText("quick-total", formatEUR(total));
 

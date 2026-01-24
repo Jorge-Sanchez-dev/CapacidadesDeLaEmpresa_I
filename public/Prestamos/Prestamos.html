@@ -6,42 +6,39 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
 
-<div id="loan-overlay" class="modal-overlay hidden">
-  <div class="modal">
-    <h3 class="modal-title">Solicitar préstamo</h3>
-
-    <form id="loan-form">
-      <div class="form-field">
-        <label for="loan-concept">Concepto</label>
-        <input
-          id="loan-concept"
-          type="text"
-          placeholder="Reforma, portátil, viaje..."
-          required
-        />
-      </div>
-
-      <div
-        style="
-          margin-top: 16px;
-          display: flex;
-          gap: 10px;
-          justify-content: flex-end;
-        "
-      >
-        <button type="button" id="loan-cancel" class="ghost-btn">
-          Cancelar
-        </button>
-        <button type="submit" class="primary-btn small-btn">
-          Aceptar
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
-
   <body>
+    <div id="loan-overlay" class="modal-overlay hidden">
+      <div class="modal">
+        <h3 class="modal-title">Solicitar préstamo</h3>
+
+        <form id="loan-form">
+          <div class="form-field">
+            <label for="loan-concept">Concepto</label>
+            <input
+              id="loan-concept"
+              type="text"
+              placeholder="Reforma, portátil, viaje..."
+              required
+            />
+          </div>
+
+          <div
+            style="
+              margin-top: 16px;
+              display: flex;
+              gap: 10px;
+              justify-content: flex-end;
+            "
+          >
+            <button type="button" id="loan-cancel" class="ghost-btn">
+              Cancelar
+            </button>
+            <button type="submit" class="primary-btn small-btn">Aceptar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <div class="layout">
       <div id="sidebar-container"></div>
 
@@ -56,20 +53,18 @@
             <h1 class="brand-name">Banco Sánchez</h1>
           </header>
 
-          <p class="greeting">
-            Hola, <span id="user-name">usuario</span> 👋
-          </p>
+          <p class="greeting" id="greeting">Hola, usuario 👋</p>
 
           <div class="card panel-card panel-card--wide">
             <h2 class="card-title">Préstamos</h2>
             <p class="card-subtitle">
               Simula, solicita y consulta tus préstamos desde un solo lugar.
             </p>
+
             <div
               class="panel-grid"
               style="grid-template-columns: 1.2fr 1fr; margin-top: 24px;"
             >
-
               <section class="info-card">
                 <h2>Resumen</h2>
 
@@ -80,8 +75,8 @@
                 <div class="info-line">
                   <span>Disponible</span>
                   <span class="info-value" id="available-amount">3.750 €</span>
-                </div>                
-            </div>
+                </div>
+              </section>
 
             <section class="transfer-section" style="margin-top: 24px;">
               <div class="transfer-header">
@@ -139,10 +134,13 @@
                   Calcular
                 </button>
 
-                <button class="primary-btn small-btn" id="open-apply">
-  Pedir préstamo
-</button>
-
+                <button
+                  type="button"
+                  class="primary-btn small-btn"
+                  id="open-apply"
+                >
+                  Pedir préstamo
+                </button>
               </form>
 
               <p id="loan-message" class="transfer-message"></p>
@@ -167,17 +165,29 @@
                     <span class="info-value" id="result-total">—</span>
                   </div>
                 </div>
+              </div>
             </section>
 
-<section class="transfer-section" style="margin-top: 18px;">
-  <div class="transfer-header">
-    <h2>Préstamos activos</h2>
-  </div>
+            <section class="transfer-section" style="margin-top: 18px;">
+              <div class="transfer-header">
+                <h2>Préstamos activos</h2>
+              </div>
 
-  <div class="movements-list" id="loans-list" style="max-height: 220px;"></div>
-</section>
+              <div
+                class="movements-list"
+                id="loans-list"
+                style="max-height: 220px;"
+              ></div>
+            </section>
+          </div>
+        </div>
+      </main>
 
-<script src="/MenuIzquierdo/MenuIzquierdo.js"></script>
-<script src="/ParaTi/ParaTi.js"></script>
+      <div id="right-rail-container"></div>
+    </div>
 
-<script src="/Prestamos/Prestamos.js"></script>
+    <script src="/MenuIzquierdo/MenuIzquierdo.js"></script>
+    <script src="/ParaTi/ParaTi.js"></script>
+    <script src="/Prestamos/Prestamos.js"></script>
+  </body>
+</html>
