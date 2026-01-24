@@ -25,6 +25,11 @@ app.use("/notifications", notificationsRoutes);
 
 app.use(express.static(path.join(__dirname, "..", "public")));
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "public", "login.html"));
+});
+
+
 const PORT = process.env.PORT || 3000;
 
 (async () => {
