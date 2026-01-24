@@ -5,7 +5,7 @@ type CountryConfig = {
 };
 
 export const COUNTRIES: Record<string, CountryConfig> = {
-  España: {
+  ES: {
     name: "España",
     postalCodeRegex: /^[0-9]{5}$/,
     cities: [

@@ -23,7 +23,7 @@ app.use("/loans", loanRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/notifications", notificationsRoutes);
 
-app.use(express.static(path.join(process.cwd(), "public")));
+app.use(express.static(path.join(__dirname, "..", "public")));
 
 const PORT = process.env.PORT || 3000;
 
