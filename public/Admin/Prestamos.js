@@ -1,8 +1,5 @@
-// public/Admin/Prestamos.js
-
-// ✅ Prefijos de API (cambia aquí y se arregla todo)
-const API_ADMIN = "/api/admin"; // <- admin API nueva
-const API_LOANS = "/loans";     // <- tus loans están montados en /loans (si los pasas a /api/loans, cambia aquí)
+const API_ADMIN = "/api/admin";
+const API_LOANS = "/loans";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("token");
@@ -29,7 +26,6 @@ async function loadLoans(token) {
   list.innerHTML = `<div class="info-card"><h2>Cargando...</h2></div>`;
 
   try {
-    // ✅ LISTADO: ahora en /api/admin/loans (evita conflicto con /Admin/Admin.html)
     const res = await fetch(
       `${API_ADMIN}/loans?status=${encodeURIComponent(status)}`,
       { headers: { Authorization: "Bearer " + token } }
@@ -222,8 +218,6 @@ function openDecisionModal(token, loanId, action) {
     try {
       if (isApprove) {
         const apr = Number(overlay.querySelector("#apr")?.value || 6);
-
-        // ✅ DECIDIR: tu endpoint actual está en /loans/:id/decide
         const res = await fetch(`${API_LOANS}/${loanId}/decide`, {
           method: "POST",
           headers: {
@@ -244,8 +238,6 @@ function openDecisionModal(token, loanId, action) {
         }
       } else {
         const reason = String(overlay.querySelector("#reason")?.value || "");
-
-        // ✅ DECIDIR: tu endpoint actual está en /loans/:id/decide
         const res = await fetch(`${API_LOANS}/${loanId}/decide`, {
           method: "POST",
           headers: {

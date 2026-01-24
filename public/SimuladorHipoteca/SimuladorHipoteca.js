@@ -2,7 +2,6 @@ function formatEUR(n) {
   return new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(n);
 }
 
-// Sistema francés: cuota mensual
 function monthlyPayment(principal, months, annualRate) {
   const r = (annualRate / 100) / 12;
   if (r === 0) return principal / months;
@@ -53,7 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const rate = Number(document.getElementById("rate").value);
       const income = Number(document.getElementById("income").value || 0);
 
-      // ✅ FIX: el select correcto es mortgage-type
       const type = document.getElementById("mortgage-type").value;
 
       if (!price || price <= 0 || down < 0 || years <= 0 || rate < 0) {
@@ -69,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const loan = price - down;
       const months = years * 12;
 
-      // Variable: estimación simple (subimos un poco el tipo para “aprox”)
       const effectiveRate = type === "variable" ? rate + 0.8 : rate;
 
       const fee = monthlyPayment(loan, months, effectiveRate);
@@ -86,7 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
       setText("total", formatEUR(total));
       setText("interest", formatEUR(interest));
 
-      // ratio cuota/ingresos
       const note = document.getElementById("health-note");
       if (income && income > 0) {
         const ratio = (fee / income) * 100;
@@ -102,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (note) note.textContent = "Introduce tus ingresos para estimar el ratio.";
       }
 
-      // aviso LTV
       if (msg) {
         if (ltv > 80) {
           const neededDown = price * 0.2;

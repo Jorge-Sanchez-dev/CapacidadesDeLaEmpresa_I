@@ -7,7 +7,7 @@ export interface INotification extends Document {
   title: string;
   message: string;
   read: boolean;
-  meta?: any; // ej: { loanId: "...", userId: "...", amount: ... }
+  meta?: any;
 }
 
 const NotificationSchema = new Schema(
@@ -15,7 +15,7 @@ const NotificationSchema = new Schema(
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true },
     message: { type: String, required: true },
-    type: { type: String, default: "INFO" }, // INFO | LOAN | BIZUM...
+    type: { type: String, default: "INFO" },
     read: { type: Boolean, default: false },
     meta: { type: Schema.Types.Mixed, default: {} },
   },

@@ -1,4 +1,3 @@
-// panel.js
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
@@ -17,13 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const transferForm = document.getElementById("transfer-form");
   const transferMsg = document.getElementById("transfer-message");
 
-  // ✅ Si venimos de un reload tras transferencia, re-mostramos el mensaje
   if (transferMsg && sessionStorage.getItem("transfer_ok") === "1") {
     transferMsg.textContent = "Transferencia realizada ✅";
     sessionStorage.removeItem("transfer_ok");
   }
 
-  // ----- FORMULARIO DE TRANSFERENCIA -----
   if (transferForm) {
     transferForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -59,23 +56,16 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ toIban, amount, concept }),
       })
         .then(async (res) => {
-          // leemos el cuerpo siempre
           const data = await res.json().catch(() => null);
-
-          // si el backend responde con error (400/401/404/500...)
           if (!res.ok) {
             const msg =
               (data && data.message) || "Error al hacer la transferencia";
             throw new Error(msg);
           }
-
           return data;
         })
         .then(() => {
-          // ✅ Guardamos flag para que, tras el reload, el mensaje siga viéndose
           sessionStorage.setItem("transfer_ok", "1");
-
-          // refrescar saldo y movimientos
           window.location.reload();
         })
         .catch((err) => {
@@ -88,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ----- CARGA DEL DASHBOARD -----
   fetch("/auth/dashboard", {
     headers: {
       Authorization: "Bearer " + token,
@@ -109,12 +98,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const { user, account, movements } = data;
 
-      // 0) Saludo personalizado
       if (user && greetingEl) {
         greetingEl.textContent = `Hola, ${user.name} 👋`;
       }
 
-      // 1) Pintar saldo, iban y alias
       if (account) {
         if (balanceAmountEl) {
           const rawBalance =
@@ -135,15 +122,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // 2) Pintar movimientos
       if (
         Array.isArray(movements) &&
         movements.length > 0 &&
         listaMovimientos
       ) {
         if (noMovements) noMovements.style.display = "none";
-
-        // ✅ Por si recargas y se duplican (depende de tu HTML), limpia antes:
         listaMovimientos.innerHTML = "";
 
         movements.forEach((mov) => {
@@ -207,7 +191,6 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error cargando dashboard:", err);
     });
 
-  // ----- LOGOUT -----
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
@@ -216,8 +199,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
-// Helpers
 
 function formatearIban(iban) {
   if (!iban) return "";

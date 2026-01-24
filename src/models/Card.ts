@@ -1,21 +1,19 @@
 import { Schema, model, Types, Document } from "mongoose";
 
 export interface ICard extends Document {
-  owner: Types.ObjectId;           // usuario dueño
-  account?: Types.ObjectId;        // (opcional) cuenta asociada
+  owner: Types.ObjectId;       
+  account?: Types.ObjectId;  
 
-  alias: string;                   // “Débito Pro”, “Joven”...
+  alias: string; 
   cardType: "DEBIT" | "CREDIT";
   brand: "VISA" | "MASTERCARD";
 
-  numberLast4: string;             // solo últimos 4
-  expiryMonth: number;             // 1-12
-  expiryYear: number;              // 2 dígitos (27, 29) o 4 (2027)
-  cvv: string;                     // demo (en real NO lo guardarías así)
+  numberLast4: string;     
+  expiryMonth: number;      
+  expiryYear: number;  
+  cvv: string;      
   status: "active" | "blocked" | "expired";
-  
-  // Para tu UI (“Sueldo/saldo: …”)
-  // En débito puedes mostrar balance de account; en crédito un “available/limit”
+
   creditLimit?: number;
 }
 

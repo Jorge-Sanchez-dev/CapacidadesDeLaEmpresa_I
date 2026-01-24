@@ -1,5 +1,3 @@
-// src/utils/location.ts
-
 type CountryConfig = {
   name: string;
   postalCodeRegex: RegExp;
@@ -45,5 +43,4 @@ export function validateLocation(
     return "El código postal no es válido para el país indicado";
   }
 
-  return null; // ✅ todo correcto
-}
+  return null;

@@ -8,11 +8,6 @@ function shuffle(arr) {
 }
 
 function bannerHTML(ad) {
-  // tipos:
-  // - "circle"      => círculo AMARILLO (cajero)
-  // - "whiteCircle" => círculo BLANCO (logo/icono)
-  // - "rect"        => media rectangular
-
   const bannerClass =
     ad.variant === "circle" ? "ad-banner ad-banner--circle" : "ad-banner";
 
@@ -45,8 +40,6 @@ fetch("/ParaTi/ParaTi.html")
     if (!container) return;
 
     container.innerHTML = html;
-
-    // ✅ Tus 8 anuncios (pon los que quieras)
     const ADS = [
       {
         variant: "circle",
@@ -115,7 +108,6 @@ fetch("/ParaTi/ParaTi.html")
       },
     ];
 
-    // ✅ Elegir 4 al azar
     const chosen = shuffle(ADS).slice(0, 4);
 
     const slot = document.getElementById("ads-slot");

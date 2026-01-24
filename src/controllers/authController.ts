@@ -1,4 +1,3 @@
-// src/controllers/authController.ts
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/User";
@@ -11,11 +10,10 @@ import { validateLocation } from "../utils/locations";
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{9,}$/;
-// min 9 caracteres, mayúscula, minúscula, número y símbolo
 
 const dniRegex = /^[0-9]{8}[A-Z]$/;
 
-const phoneRegex = /^[67][0-9]{8}$/; // empieza por 6 o 7 y 9 dígitos
+const phoneRegex = /^[67][0-9]{8}$/;
 
 function isAdult(birthDate: string): boolean {
   const birth = new Date(birthDate);
@@ -58,10 +56,6 @@ export const register = async (req: Request, res: Response) => {
       mainCurrency,
     } = req.body;
 
-    /* =========================
-       VALIDACIONES OBLIGATORIAS
-       ========================= */
-
     if (
       !name ||
       !surname ||
@@ -76,14 +70,12 @@ export const register = async (req: Request, res: Response) => {
       });
     }
 
-    // 📧 Email
     if (!emailRegex.test(email)) {
       return res.status(400).json({
         message: "Formato de email no válido",
       });
     }
 
-    // 🔐 Password fuerte
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
         message:
@@ -91,36 +83,29 @@ export const register = async (req: Request, res: Response) => {
       });
     }
 
-    // 🆔 DNI español
     if (!dniRegex.test(dni)) {
       return res.status(400).json({
         message: "DNI no válido (8 números y una letra)",
       });
     }
 
-    // 🎂 Fecha de nacimiento
     if (!isAdult(birthDate)) {
       return res.status(400).json({
         message: "Debes ser mayor de edad y la fecha debe ser anterior a hoy",
       });
     }
 
-    // 📍 Validación de país, ciudad y código postal
     const locationError = validateLocation(country, city, postalCode);
     if (locationError) {
       return res.status(400).json({ message: locationError });
     }
 
-    // 📱 Teléfono
     if (!phoneRegex.test(phone)) {
       return res.status(400).json({
         message: "El teléfono debe empezar por 6 o 7 y tener 9 dígitos",
       });
     }
 
-    /* =========================
-       COMPROBACIONES DE DUPLICADOS
-       ========================= */
 
     const emailExists = await User.findOne({ email }).lean();
     if (emailExists) {
@@ -136,13 +121,9 @@ export const register = async (req: Request, res: Response) => {
       });
     }
 
-    /* =========================
-       CREACIÓN DE USUARIO
-       ========================= */
 
     const hashed = await bcrypt.hash(password, 10);
 
-    // Primer usuario = ADMIN
     const existingAdmin = await User.findOne({ role: "ADMIN" }).lean();
     const roleToAssign = existingAdmin ? "USER" : "ADMIN";
 
@@ -162,9 +143,7 @@ export const register = async (req: Request, res: Response) => {
       role: roleToAssign,
     });
 
-    /* =========================
-       CREACIÓN DE CUENTA NÓMINA
-       ========================= */
+
 
     const timestamp = Date.now().toString().slice(-10);
     const fakeAccountNumber = "0000" + timestamp;
@@ -247,13 +226,12 @@ export const me = (req: any, res: Response) => {
   return res.json({ user: req.user });
 };
 
-// DASHBOARD: cuenta principal + últimos movimientos (transfers + bizums)
+// DASHBOARD
 export const dashboard = async (req: any, res: Response) => {
   try {
     const userId = req.user?._id;
     if (!userId) return res.status(401).json({ message: "No autenticado" });
 
-    // 1) Cuenta principal
     const mainAccount = await Account.findOne({
       owner: userId,
       isMain: true,
@@ -264,7 +242,6 @@ export const dashboard = async (req: any, res: Response) => {
       return res.json({ user: req.user, account: null, movements: [] });
     }
 
-    // 2) Últimas transferencias
     const transfers = await Transfer.find({
       status: "completed",
       $or: [{ fromAccount: mainAccount._id }, { toAccount: mainAccount._id }],
@@ -273,7 +250,6 @@ export const dashboard = async (req: any, res: Response) => {
       .limit(10)
       .lean();
 
-    // 3) Últimos bizums
     const bizums = await Bizum.find({
       status: "COMPLETED",
       $or: [{ fromUser: userId }, { toUser: userId }],
@@ -282,7 +258,6 @@ export const dashboard = async (req: any, res: Response) => {
       .limit(10)
       .lean();
 
-    // 4) Resumen cuenta
     const accountSummary = {
       alias: mainAccount.alias || "Cuenta principal",
       iban: mainAccount.iban,
@@ -290,13 +265,11 @@ export const dashboard = async (req: any, res: Response) => {
       currency: mainAccount.currency,
     };
 
-    // helper fecha segura
     const toMillis = (d: any) => {
       const t = new Date(d).getTime();
       return Number.isFinite(t) ? t : 0;
     };
 
-    // 5) Transfers -> movements
     const transferMovements = transfers.map((t: any) => {
       const isOutgoing = String(t.fromAccount) === String(mainAccount._id);
       return {
@@ -308,7 +281,6 @@ export const dashboard = async (req: any, res: Response) => {
       };
     });
 
-    // 6) Bizums -> movements
     const bizumMovements = bizums.map((b: any) => {
       const isOutgoing = String(b.fromUser) === String(userId);
       return {
@@ -320,7 +292,6 @@ export const dashboard = async (req: any, res: Response) => {
       };
     });
 
-    // 7) Mezclar + ordenar + top 10
     const allMovements = [...bizumMovements, ...transferMovements]
       .sort((a, c) => toMillis(c.date) - toMillis(a.date))
       .slice(0, 10);
@@ -336,7 +307,6 @@ export const dashboard = async (req: any, res: Response) => {
   }
 };
 
-// TRANSFERENCIA por IBAN (tuya, sin cambios relevantes)
 export const transfer = async (req: any, res: Response) => {
   try {
     const user = req.user;

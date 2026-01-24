@@ -1,4 +1,3 @@
-// src/models/Account.ts
 import { Schema, model, Types, Document } from "mongoose";
 
 export interface IAccount extends Document {

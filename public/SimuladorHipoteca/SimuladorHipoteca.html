@@ -8,13 +8,10 @@
 
   <body>
     <div class="layout">
-      <!-- SIDEBAR -->
       <div id="sidebar-container"></div>
 
-      <!-- MAIN -->
       <main class="main-panel">
         <div class="page-wrapper">
-          <!-- BRAND -->
           <header class="brand-header">
             <img
               src="/photos/logo%20sin%20fondo.png"
@@ -24,17 +21,14 @@
             <h1 class="brand-name">Banco Sánchez</h1>
           </header>
 
-          <!-- SALUDO -->
           <p class="greeting">Hola, <span id="user-name">usuario</span> 👋</p>
 
-          <!-- CARD PRINCIPAL -->
           <div class="card panel-card panel-card--wide">
             <h2 class="card-title">Simulador de hipoteca</h2>
             <p class="card-subtitle">
               Calcula tu cuota mensual, intereses y coste total (estimación).
             </p>
 
-            <!-- RESUMEN + CONSEJOS -->
             <div
               class="panel-grid"
               style="grid-template-columns: 1.15fr 1fr; margin-top: 24px"
@@ -58,32 +52,9 @@
                 <button class="ghost-btn" id="reset" style="margin-top: 12px">
                   Reiniciar
                 </button>
-              </section>
-
-              <!-- <section class="info-card">
-                <h2>Consejo</h2>
-                <div
-                  style="
-                    opacity: 0.85;
-                    font-size: 0.95rem;
-                    line-height: 1.35;
-                  "
-                >
-                  Intenta que la cuota no supere el <b>30%</b> de tus ingresos
-                  mensuales. Y que tu “entrada” no sea un “me lo invento” 😄
-                </div>
-
-                <button
-                  class="primary-btn small-btn"
-                  id="save-sim"
-                  style="margin-top: 14px;"
-                >
-                  Guardar simulación
-                </button>
-              </section> -->
+              </section>     
             </div>
 
-            <!-- SIMULADOR -->
             <section class="transfer-section" style="margin-top: 24px">
               <div class="transfer-header">
                 <h2>Datos de la vivienda</h2>
@@ -179,7 +150,6 @@
 
               <p id="mortgage-message" class="transfer-message"></p>
 
-              <!-- RESULTADOS -->
               <div
                 class="panel-grid"
                 style="grid-template-columns: 1fr 1fr; margin-top: 16px"
@@ -218,16 +188,11 @@
                     "
                   >
                     Introduce tus ingresos para estimar el ratio.
-                  </div>
-
-                  <!-- <button class="ghost-btn" id="copy" style="margin-top: 14px;">
-                    Copiar resultado
-                  </button>-->
+                </div>
                 </div>
               </div>
             </section>
 
-            <!-- NOTA LEGAL -->
             <div
               style="
                 margin-top: 16px;
@@ -243,18 +208,14 @@
         </div>
       </main>
 
-      <!-- ANUNCIOS DERECHA (reutilizables) -->
       <div id="right-rail-container"></div>
     </div>
 
-    <!-- Reutilizables -->
     <script src="/MenuIzquierdo/MenuIzquierdo.js"></script>
     <script src="/ParaTi/ParaTi.js"></script>
 
-    <!-- JS de esta página -->
     <script src="/SimuladorHipoteca/SimuladorHipoteca.js"></script>
 
-    <!-- Nombre usuario -->
     <script>
       const stored = localStorage.getItem("userName");
       document.getElementById("user-name").textContent = stored || "Jorge";

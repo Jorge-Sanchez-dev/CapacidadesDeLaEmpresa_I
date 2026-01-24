@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
 
-  <!-- MODAL: Solicitar préstamo -->
 <div id="loan-overlay" class="modal-overlay hidden">
   <div class="modal">
     <h3 class="modal-title">Solicitar préstamo</h3>
@@ -44,13 +43,10 @@
 
   <body>
     <div class="layout">
-      <!-- SIDEBAR -->
       <div id="sidebar-container"></div>
 
-      <!-- MAIN -->
       <main class="main-panel">
         <div class="page-wrapper">
-          <!-- BRAND -->
           <header class="brand-header">
             <img
               src="/photos/logo%20sin%20fondo.png"
@@ -60,24 +56,20 @@
             <h1 class="brand-name">Banco Sánchez</h1>
           </header>
 
-          <!-- SALUDO -->
           <p class="greeting">
             Hola, <span id="user-name">usuario</span> 👋
           </p>
 
-          <!-- CARD PRINCIPAL -->
           <div class="card panel-card panel-card--wide">
             <h2 class="card-title">Préstamos</h2>
             <p class="card-subtitle">
               Simula, solicita y consulta tus préstamos desde un solo lugar.
             </p>
-
-            <!-- GRID: resumen + acciones -->
             <div
               class="panel-grid"
               style="grid-template-columns: 1.2fr 1fr; margin-top: 24px;"
             >
-              <!-- RESUMEN -->
+
               <section class="info-card">
                 <h2>Resumen</h2>
 
@@ -88,47 +80,9 @@
                 <div class="info-line">
                   <span>Disponible</span>
                   <span class="info-value" id="available-amount">3.750 €</span>
-                </div>
-<!--
-                <button class="primary-btn small-btn" id="open-apply">
-                  Solicitar préstamo
-                </button>
-
-                 <button
-                  class="ghost-btn"
-                  id="view-conditions"
-                  style="margin-top: 10px;"
-                >
-                  Ver condiciones
-                </button>
-              </section> -->
-
-              <!-- ACCESOS RÁPIDOS -->
-              <!--<section class="info-card">
-                <h2>Accesos rápidos</h2>
-
-                <div class="info-line">
-                  <span>Cuota estimada</span>
-                  <span class="info-value" id="quick-fee">—</span>
-                </div>
-                <div class="info-line">
-                  <span>Coste total</span>
-                  <span class="info-value" id="quick-total">—</span>
-                </div>
-
-                <div
-                  style="
-                    margin-top: 12px;
-                    opacity: 0.85;
-                    font-size: 0.9rem;
-                  "
-                >
-                  Usa el simulador de abajo para calcular tu cuota en segundos.
-                </div>
-              </section>-->
+                </div>                
             </div>
 
-            <!-- SIMULADOR -->
             <section class="transfer-section" style="margin-top: 24px;">
               <div class="transfer-header">
                 <h2>Simulador rápido</h2>
@@ -193,7 +147,6 @@
 
               <p id="loan-message" class="transfer-message"></p>
 
-              <!-- RESULTADOS -->
               <div
                 class="panel-grid"
                 style="grid-template-columns: 1fr 1fr; margin-top: 16px;"
@@ -214,45 +167,17 @@
                     <span class="info-value" id="result-total">—</span>
                   </div>
                 </div>
-
-                <!-- <div class="info-card">
-                  <h2>Recomendación</h2>
-                  <div
-                    style="
-                      opacity: 0.85;
-                      font-size: 0.95rem;
-                      line-height: 1.35;
-                    "
-                  >
-                    Para una cuota cómoda, intenta que no supere el
-                    <b>30%</b> de tus ingresos mensuales.
-                    (Consejo amistoso, no magia financiera 😄)
-                  </div>
-
-                  <button
-                    class="ghost-btn"
-                    id="copy-simulation"
-                    style="margin-top: 14px;"
-                  >
-                    Copiar simulación
-                  </button>
-                </div>
-              </div> -->
             </section>
 
-            <!-- PRÉSTAMOS ACTIVOS -->
 <section class="transfer-section" style="margin-top: 18px;">
   <div class="transfer-header">
     <h2>Préstamos activos</h2>
   </div>
 
-  <!-- ✅ contenedor necesario para renderLoans -->
   <div class="movements-list" id="loans-list" style="max-height: 220px;"></div>
 </section>
 
-<!-- Reutilizables -->
 <script src="/MenuIzquierdo/MenuIzquierdo.js"></script>
 <script src="/ParaTi/ParaTi.js"></script>
 
-<!-- ✅ JS de esta página (sin /public) -->
 <script src="/Prestamos/Prestamos.js"></script>

@@ -1,9 +1,6 @@
-// main.js
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ========================
-  // LOGIN
-  // ========================
+
   const loginForm = document.getElementById("login-form");
 
   if (loginForm) {
@@ -30,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
           throw new Error(data.message || "Error al iniciar sesión");
         }
 
-        // ✅ Guardar token + userName + userRole
         localStorage.setItem("token", data.token);
 
         const role = data?.user?.role || "USER";
@@ -42,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (msg) msg.textContent = "Login correcto ✔";
 
-        // ✅ Redirigir según rol
         if (role === "ADMIN") {
           window.location.href = "/Admin/Admin.html";
         } else {
@@ -54,9 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ========================
-  // REGISTRO
-  // ========================
   const registerForm = document.getElementById("register-form");
   if (registerForm) {
     const msg = document.getElementById("msg");
@@ -124,16 +116,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ========================
-  // LOGOUT (en el panel)
-  // ========================
   const logoutBtn = document.getElementById("logout-btn");
 
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       localStorage.removeItem("token");
       localStorage.removeItem("userName");
-      localStorage.removeItem("userRole"); // ✅ importante
+      localStorage.removeItem("userRole");
       window.location.href = "/login.html";
     });
   }

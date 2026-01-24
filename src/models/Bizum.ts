@@ -10,7 +10,6 @@ export interface IBizum {
   amount: number;
   concept?: string;
 
-  // “Bizum style”: móvil (opcional, por si en tu UI lo metes)
   toPhone?: string;
 
   status: "PENDING" | "COMPLETED" | "FAILED";

@@ -6,7 +6,6 @@ fetch("/MenuIzquierdo/MenuIzquierdo.html")
 
     container.innerHTML = html;
 
-    // ✅ 1) Activar item actual
     const items = container.querySelectorAll(".sidebar-item");
     items.forEach((a) => a.classList.remove("active"));
 
@@ -18,15 +17,12 @@ fetch("/MenuIzquierdo/MenuIzquierdo.html")
     });
     if (match) match.classList.add("active");
 
-    // ✅ 2) LOGOUT (esto es lo que te falta)
     const logoutBtn = container.querySelector("#logout-btn");
     if (logoutBtn) {
       logoutBtn.addEventListener("click", () => {
         localStorage.removeItem("token");
-        // si guardas más cosas:
         localStorage.removeItem("userName");
         localStorage.removeItem("user");
-        // redirige
         window.location.href = "/login.html";
       });
     }

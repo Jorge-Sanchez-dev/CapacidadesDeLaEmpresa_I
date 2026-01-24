@@ -35,7 +35,6 @@ export const createCard = async (req: any, res: Response) => {
 
     const { alias, cardType, brand, creditLimit } = req.body;
 
-    // ⛔ Límite de tarjetas de crédito (máx 3)
     if (cardType === "CREDIT") {
       const creditCount = await Card.countDocuments({
         owner: userId,
@@ -50,7 +49,6 @@ export const createCard = async (req: any, res: Response) => {
       }
     }
 
-    // ⛔ Límite de tarjeta de débito (solo 1)
     if (cardType === "DEBIT") {
       const existingDebit = await Card.findOne({
         owner: userId,
@@ -69,7 +67,6 @@ export const createCard = async (req: any, res: Response) => {
       return res.status(400).json({ message: "Datos inválidos" });
     }
 
-    // ✅ Validar límite si es crédito
     let parsedCreditLimit: number | undefined = undefined;
     if (cardType === "CREDIT") {
       const lim = Number(creditLimit);
@@ -79,7 +76,6 @@ export const createCard = async (req: any, res: Response) => {
       parsedCreditLimit = lim;
     }
 
-    // (Opcional) asociar por defecto a la cuenta principal si es débito
     let accountId = undefined;
     if (cardType === "DEBIT") {
       const mainAcc = await Account.findOne({

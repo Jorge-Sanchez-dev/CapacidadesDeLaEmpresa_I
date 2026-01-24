@@ -1,17 +1,13 @@
-// src/controllers/adminController.ts
 import { Request, Response } from "express";
 import User from "../models/User";
 import Account from "../models/Account";
 import Transfer from "../models/Transfer";
 import Bizum from "../models/Bizum";
 
-/* =========================
-   LISTAR USUARIOS
-   ========================= */
 export const adminListUsers = async (req: Request, res: Response) => {
   try {
     const users = await User.find()
-      .select("-password") // ✅ nunca mandar password
+      .select("-password")
       .sort({ createdAt: -1 })
       .lean();
 
@@ -22,9 +18,6 @@ export const adminListUsers = async (req: Request, res: Response) => {
   }
 };
 
-/* =========================
-   ACTUALIZAR USUARIO
-   ========================= */
 export const adminUpdateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -62,11 +55,7 @@ export const adminUpdateUser = async (req: Request, res: Response) => {
   }
 };
 
-/* =========================
-   RESUMEN USUARIO
-   - user + cuenta principal
-   - movimientos (Transfer + Bizum)
-   ========================= */
+
 export const adminUserSummary = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -84,7 +73,7 @@ export const adminUserSummary = async (req: Request, res: Response) => {
       return res.json({ user, account: null, movements: [] });
     }
 
-    // 1) TRANSFERS por cuenta
+
     const transfers = await Transfer.find({
       status: "completed",
       $or: [{ fromAccount: account._id }, { toAccount: account._id }],
@@ -101,7 +90,6 @@ export const adminUserSummary = async (req: Request, res: Response) => {
       concept: t.concept ? `Transferencia · ${t.concept}` : "Transferencia",
     }));
 
-    // 2) BIZUMS (robusto)
     let bizums: any[] = await Bizum.find({
       status: "COMPLETED",
       $or: [{ fromUser: id }, { toUser: id }],
@@ -159,13 +147,7 @@ export const adminUserSummary = async (req: Request, res: Response) => {
   }
 };
 
-/* =========================
-   ADMIN DASHBOARD (MEJORADO)
-   - KPIs
-   - últimos usuarios
-   - actividad reciente con:
-     "quién manda" -> "a quién"
-   ========================= */
+
 export const adminDashboard = async (req: Request, res: Response) => {
   try {
     const now = new Date();
@@ -182,8 +164,6 @@ export const adminDashboard = async (req: Request, res: Response) => {
       bizumsLast7d,
       balanceAgg,
       lastUsers,
-
-      // ✅ Con populate para sacar dueño origen/destino
       lastTransfers,
       lastBizums,
     ] = await Promise.all([
@@ -206,7 +186,6 @@ export const adminDashboard = async (req: Request, res: Response) => {
 
       User.find().select("-password").sort({ createdAt: -1 }).limit(8).lean(),
 
-      // Transfers: fromAccount/toAccount -> owner (User)
       Transfer.find({ status: "completed" })
         .sort({ date: -1 })
         .limit(15)
@@ -222,7 +201,6 @@ export const adminDashboard = async (req: Request, res: Response) => {
         })
         .lean(),
 
-      // Bizum: puede ser por usuario o por cuenta (cubrimos ambos)
       Bizum.find({ status: "COMPLETED" })
         .sort({ createdAt: -1 })
         .limit(15)
@@ -243,14 +221,12 @@ export const adminDashboard = async (req: Request, res: Response) => {
 
     const totalBalance = Number(balanceAgg?.[0]?.totalBalance || 0);
 
-    // Helper para nombre bonito
     const fullName = (u: any) => {
       if (!u) return "—";
       const n = [u.name, u.surname].filter(Boolean).join(" ").trim();
       return n || u.email || "—";
     };
 
-    // Normalizar transfers con FROM/TO
     const transferMovs = (lastTransfers || []).map((t: any) => {
       const fromOwner = t.fromAccount?.owner;
       const toOwner = t.toAccount?.owner;
@@ -274,7 +250,6 @@ export const adminDashboard = async (req: Request, res: Response) => {
       };
     });
 
-    // Normalizar bizums con FROM/TO (usuario si existe, si no dueño de cuenta)
     const bizumMovs = (lastBizums || []).map((b: any) => {
       const fromU = b.fromUser;
       const toU = b.toUser;

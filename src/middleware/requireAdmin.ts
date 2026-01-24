@@ -1,4 +1,4 @@
-// src/middleware/requireAdmin.ts
+
 import { Response, NextFunction } from "express";
 import { AuthRequest } from "../types";
 

@@ -9,7 +9,6 @@ fetch("/Admin/MenuAdmin.html")
 
     container.innerHTML = html;
 
-    // activar item actual (opcional)
     const items = container.querySelectorAll(".sidebar-item");
     items.forEach((a) => a.classList.remove("active"));
 
@@ -21,7 +20,6 @@ fetch("/Admin/MenuAdmin.html")
     });
     if (match) match.classList.add("active");
 
-    // logout
     const logoutBtn = document.getElementById("logout-btn");
     logoutBtn?.addEventListener("click", () => {
       localStorage.removeItem("token");

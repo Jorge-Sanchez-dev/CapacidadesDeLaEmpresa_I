@@ -1,4 +1,3 @@
-// src/controllers/loanController.ts
 import { Response } from "express";
 import Loan from "../models/Loan";
 import Account from "../models/Account";
@@ -18,16 +17,10 @@ function monthlyPayment(principal: number, months: number, annualRate: number) {
   return (P * (r * Math.pow(1 + r, M))) / (Math.pow(1 + r, M) - 1);
 }
 
-// Helper: saca userId tanto si guardas req.user como req.userId
 function getAuthUserId(req: any) {
   return req?.user?._id || req?.userId || null;
 }
 
-/* =========================
-   USER: solicitar préstamo
-   POST /loans/request
-   body: { amount, months, apr, purpose }   (acepta concept también)
-   ========================= */
 export const requestLoan = async (req: any, res: Response) => {
   try {
     const userId = getAuthUserId(req);
@@ -51,7 +44,6 @@ export const requestLoan = async (req: any, res: Response) => {
       return res.status(400).json({ message: "Introduce un concepto/motivo del préstamo" });
     }
 
-    // cuenta principal activa (si quieres obligar a que exista)
     const mainAcc = await Account.findOne({
       owner: userId,
       isMain: true,
@@ -62,7 +54,6 @@ export const requestLoan = async (req: any, res: Response) => {
       return res.status(400).json({ message: "El usuario no tiene cuenta principal activa" });
     }
 
-    // Pre-cálculo para que el front tenga datos desde el minuto 0
     const fee = monthlyPayment(A, M, R);
     const total = fee * M;
 
@@ -80,7 +71,6 @@ export const requestLoan = async (req: any, res: Response) => {
       remainingToPay: Math.round(total * 100) / 100,
     });
 
-    // Notificar admin (primer admin)
     const admin = await User.findOne({ role: "ADMIN" }).lean();
     if (admin) {
       await Notification.create({
@@ -106,10 +96,6 @@ export const requestLoan = async (req: any, res: Response) => {
   }
 };
 
-/* =========================
-   USER: ver mis préstamos
-   GET /loans/mine
-   ========================= */
 export const getMyLoans = async (req: any, res: Response) => {
   try {
     const userId = getAuthUserId(req);
@@ -122,8 +108,7 @@ export const getMyLoans = async (req: any, res: Response) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    // ✅ Parche útil: si hay docs viejos sin remainingToPay pero con totalToPay, lo devolvemos bien
-    const fixed = (loans || []).map((l: any) => {
+      const fixed = (loans || []).map((l: any) => {
       const total = Number(l.totalToPay ?? 0);
       const remain = Number(l.remainingToPay ?? 0);
       if ((!remain || remain === 0) && total > 0) {
@@ -139,10 +124,6 @@ export const getMyLoans = async (req: any, res: Response) => {
   }
 };
 
-/* =========================
-   ADMIN: ver pendientes
-   GET /loans/pending
-   ========================= */
 export const listPendingLoans = async (req: any, res: Response) => {
   try {
     const loans = await Loan.find({ status: "PENDING" })
@@ -157,11 +138,7 @@ export const listPendingLoans = async (req: any, res: Response) => {
   }
 };
 
-/* =========================
-   ADMIN: decidir
-   POST /loans/:id/decide
-   body: { action: "APPROVE" | "REJECT", apr?, reason? }
-   ========================= */
+
 export const decideLoan = async (req: any, res: Response) => {
   try {
     const adminId = getAuthUserId(req);
@@ -174,7 +151,6 @@ export const decideLoan = async (req: any, res: Response) => {
       return res.status(400).json({ message: "Acción inválida (APPROVE/REJECT)" });
     }
 
-    // Cargamos el loan primero para poder recalcular correctamente
     const loan = await Loan.findById(id);
     if (!loan) return res.status(404).json({ message: "Préstamo no encontrado" });
 
@@ -182,7 +158,6 @@ export const decideLoan = async (req: any, res: Response) => {
       return res.status(400).json({ message: "Préstamo ya decidido" });
     }
 
-    // Campos comunes
     (loan as any).decidedAt = new Date();
     (loan as any).decidedBy = adminId;
 
@@ -190,7 +165,6 @@ export const decideLoan = async (req: any, res: Response) => {
       (loan as any).status = "APPROVED";
       (loan as any).startedAt = new Date();
 
-      // APR: si admin lo manda, sobrescribe; si no, deja el que venía
       if (apr !== undefined && apr !== null && apr !== "") {
         const newApr = Number(apr);
         if (!Number.isFinite(newApr) || newApr < 0) {
@@ -199,7 +173,6 @@ export const decideLoan = async (req: any, res: Response) => {
         (loan as any).interestAPR = newApr;
       }
 
-      // ✅ recalcula cuota/total/remaining (para evitar el “pendiente 0,00€”)
       const A = Number((loan as any).amount || 0);
       const M = Number((loan as any).months || 0);
       const R = Number((loan as any).interestAPR || 0);
@@ -210,8 +183,6 @@ export const decideLoan = async (req: any, res: Response) => {
       (loan as any).monthlyPayment = Math.round(fee * 100) / 100;
       (loan as any).totalToPay = Math.round(total * 100) / 100;
 
-      // Si ya había remainingToPay por pagos parciales, no lo machacamos.
-      // Pero si está a 0, lo inicializamos al total.
       const currentRemaining = Number((loan as any).remainingToPay || 0);
       if (!currentRemaining || currentRemaining === 0) {
         (loan as any).remainingToPay = Math.round(total * 100) / 100;
@@ -223,7 +194,6 @@ export const decideLoan = async (req: any, res: Response) => {
 
     await loan.save();
 
-    // Notificar al usuario (applicant)
     if (!(loan as any).applicant) {
       return res.status(400).json({
         message: "Este préstamo está corrupto: falta applicant. Borra/corrige el documento en la BBDD.",

@@ -7,8 +7,6 @@
   </head>
 
   <body>
-
-    <!-- MODAL 1: Elegir tipo -->
     <div id="card-type-overlay" class="modal-overlay hidden">
       <div class="modal">
         <h3 class="modal-title">Crear nueva tarjeta</h3>
@@ -37,7 +35,6 @@
       </div>
     </div>
 
-    <!-- MODAL 2: Configurar crédito -->
     <div id="credit-overlay" class="modal-overlay hidden">
       <div class="modal">
         <h3 class="modal-title">Crear tarjeta de crédito</h3>
@@ -72,7 +69,6 @@
       </div>
     </div>
 
-    <!-- MODAL AVISOS / ERRORES (showModal) -->
 <div id="modal-overlay" class="modal-overlay hidden">
   <div class="modal">
     <h3 id="modal-title" class="modal-title">Aviso</h3>
@@ -86,13 +82,9 @@
 
 
     <div class="layout">
-      <!-- SIDEBAR -->
       <div id="sidebar-container"></div>
-
-      <!-- MAIN -->
       <main class="main-panel">
         <div class="page-wrapper">
-          <!-- BRAND -->
           <header class="brand-header">
             <img
               src="/photos/logo%20sin%20fondo.png"
@@ -102,17 +94,14 @@
             <h1 class="brand-name">Banco Sánchez</h1>
           </header>
 
-          <!-- SALUDO -->
           <p class="greeting" id="greeting">Hola, usuario 👋</p>
 
-          <!-- CARD PRINCIPAL -->
           <div class="card panel-card panel-card--wide">
             <h2 class="card-title">Tarjetas</h2>
             <p class="card-subtitle">
               Gestiona tus tarjetas y consulta datos principales.
             </p>
 
-            <!-- CABECERA -->
             <div
               class="panel-footer"
               style="justify-content: space-between; margin-top: 18px"
@@ -126,7 +115,6 @@
               </button>
             </div>
 
-            <!-- GRID TARJETAS -->
             <div
               class="panel-grid"
               id="cards-grid"
@@ -136,15 +124,12 @@
         </div>
       </main>
 
-      <!-- ANUNCIOS DERECHA -->
       <div id="right-rail-container"></div>
     </div>
 
-    <!-- Reutilizables -->
     <script src="/MenuIzquierdo/MenuIzquierdo.js"></script>
     <script src="/ParaTi/ParaTi.js"></script>
 
-    <!-- Lógica de esta página -->
     <script src="/Tarjetas/Tarjetas.js"></script>
   </body>
 </html>

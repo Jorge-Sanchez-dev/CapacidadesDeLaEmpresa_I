@@ -96,7 +96,6 @@ async function markRead(token, id) {
 }
 
 async function markAllRead(token) {
-  // Si no tienes endpoint “mark all”, lo hacemos a lo bruto: leer y marcar uno a uno
   try {
     const res = await fetch("/notifications/mine", {
       headers: { Authorization: "Bearer " + token },

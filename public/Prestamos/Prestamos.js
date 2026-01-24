@@ -1,4 +1,4 @@
-// Prestamos/Prestamos.js
+
 console.log("✅ Prestamos.js cargado");
 
 function formatEUR(n) {
@@ -8,7 +8,6 @@ function formatEUR(n) {
   }).format(Number(n || 0));
 }
 
-// Cálculo cuota: sistema francés
 function monthlyPayment(principal, months, annualRate) {
   const P = Number(principal || 0);
   const M = Number(months || 0);
@@ -16,7 +15,7 @@ function monthlyPayment(principal, months, annualRate) {
 
   if (!M) return 0;
 
-  const r = R / 100 / 12; // tasa mensual
+  const r = R / 100 / 12;
   if (r === 0) return P / M;
   return (P * (r * Math.pow(1 + r, M))) / (Math.pow(1 + r, M) - 1);
 }
@@ -51,7 +50,6 @@ function renderLoans(loans) {
   const list = document.getElementById("loans-list");
   if (!list) return;
 
-  // helper local (no dependas de escapeHtml externo)
   const safe = (v) =>
     String(v ?? "")
       .replaceAll("&", "&amp;")
@@ -88,20 +86,15 @@ function renderLoans(loans) {
   console.log("LOANS (API) ->", loans);
 
   loans.forEach((l) => {
-    // ✅ tu modelo usa startedAt (y si no existe, createdAt)
     const start = l.startedAt ? isoDate(l.startedAt) : isoDate(l.createdAt);
 
-    // ✅ tu modelo usa purpose (fallbacks por si acaso)
     const concept =
       String(l.purpose ?? l.concept ?? l.title ?? l.name ?? "").trim() ||
       "Préstamo";
 
     const months = Number(l.months ?? 0);
 
-    // ✅ tu modelo usa monthlyPayment
     let fee = Number(l.monthlyPayment ?? l.monthlyFee ?? 0);
-
-    // ✅ si no viene cuota, la calculamos con amount + months + interestAPR
     const apr = Number(l.interestAPR ?? l.apr ?? l.interestRate ?? 0);
     const amount = Number(l.amount ?? l.principal ?? 0);
 
@@ -109,7 +102,6 @@ function renderLoans(loans) {
       fee = monthlyPayment(amount, months, apr);
     }
 
-    // ✅ tu modelo usa remainingToPay
     const remaining = Number(
       l.remainingToPay ?? l.remaining ?? l.totalToPay ?? l.total ?? amount ?? 0
     );
@@ -146,10 +138,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnApply = document.getElementById("open-apply");
   const btnCopy = document.getElementById("copy-simulation");
 
-  // Evita submit accidental si está dentro del form
   if (btnApply) btnApply.setAttribute("type", "button");
 
-  // ===== MODAL SOLICITUD =====
   const loanOverlay = document.getElementById("loan-overlay");
   const loanForm = document.getElementById("loan-form");
   const loanCancel = document.getElementById("loan-cancel");
@@ -182,9 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ===== BACKEND calls =====
   async function requestLoan({ amount, months, apr, purpose }) {
-    // ✅ tu backend/modelo usa "purpose" e "interestAPR" (tu controller puede mapear apr a interestAPR)
     const res = await fetch("/loans/request", {
       method: "POST",
       headers: {
@@ -213,7 +201,6 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const loans = await loadMyLoans();
 
-      // ✅ “Activos” = aprobados/activos (tu modelo usa APPROVED)
       const activeLoans = loans.filter(
         (l) => l?.status === "APPROVED" || l?.status === "ACTIVE"
       );
@@ -226,7 +213,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ===== SIMULADOR =====
   if (form) {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -262,7 +248,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===== PEDIR PRÉSTAMO =====
   if (btnApply) {
     btnApply.addEventListener("click", () => {
       const amount = Number(document.getElementById("loan-amount")?.value);
@@ -304,7 +289,6 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       setMessage("Enviando solicitud...", "info");
 
-      // ✅ enviamos "purpose" al backend (tu schema lo guarda así)
       await requestLoan({ amount, months, apr, purpose });
 
       closeLoanModal();
@@ -317,7 +301,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ===== COPIAR SIMULACIÓN =====
   if (btnCopy) {
     btnCopy.addEventListener("click", () => {
       const fee = document.getElementById("result-fee")?.textContent || "—";
@@ -331,7 +314,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===== INIT =====
   setMessage("");
   refreshLoans();
 });

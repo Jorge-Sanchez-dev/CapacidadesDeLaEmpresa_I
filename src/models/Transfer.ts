@@ -1,4 +1,3 @@
-// src/models/Transfer.ts
 import { Schema, model, Types, Document } from "mongoose";
 
 export interface ITransfer extends Document {
@@ -17,12 +16,12 @@ export interface ITransfer extends Document {
 const transferSchema = new Schema<ITransfer>(
   {
     fromAccount: {
-      type: Schema.Types.ObjectId,   // 👈 CAMBIO AQUÍ
+      type: Schema.Types.ObjectId,
       ref: "Account",
       required: true,
     },
     toAccount: {
-      type: Schema.Types.ObjectId,   // 👈 Y AQUÍ
+      type: Schema.Types.ObjectId,
       ref: "Account",
     },
 

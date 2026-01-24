@@ -21,8 +21,6 @@ export const createBizum = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Datos inválidos" });
     }
 
-    // 1) Buscar usuario destino por teléfono
-    // ⚠️ CAMBIA "phone" por el nombre real del campo en tu User (telefono, mobile, etc.)
     const toUser = await User.findOne({ phone }).session(session);
     if (!toUser) {
       return res.status(404).json({ message: "No existe un usuario con ese teléfono" });
@@ -32,8 +30,6 @@ export const createBizum = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "No puedes enviarte un Bizum a ti mismo" });
     }
 
-    // 2) Obtener cuenta origen y destino (la primera / principal)
-    // ⚠️ CAMBIA "owner" por tu campo real en Account (userId, user, etc.)
    let fromAcc = await Account.findOne({
   owner: userId,
   status: "active",
@@ -54,14 +50,12 @@ if (!fromAcc || !toAcc) {
       return res.status(400).json({ message: "Saldo insuficiente" });
     }
 
-    // 3) Actualizar saldos
     (fromAcc as any).balance = Number((fromAcc as any).balance) - amt;
     (toAcc as any).balance = Number((toAcc as any).balance) + amt;
 
     await fromAcc.save({ session });
     await toAcc.save({ session });
 
-    // 4) Guardar Bizum
     const bizum = await Bizum.create(
       [{
         fromUser: userId,

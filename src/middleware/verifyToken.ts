@@ -16,18 +16,15 @@ export async function verifyToken(
   const token = header.split(" ")[1];
 
   try {
-    // Decodificar token para obtener el ID
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
 
-    // 🔥 Cargar el usuario completo desde MongoDB
     const user = await User.findById(decoded.id).lean();
 
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Guardar el usuario real en la request
-req.user = user as any;   // rápido y efectivo
+req.user = user as any;
 (req as any).userId = user._id; 
 
     next();

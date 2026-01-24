@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import path from "path";
 import { connectMongoDB } from "./mongo";
 
-// Routes
 import authRoutes from "./routes/auth";
 import bizumRoutes from "./routes/bizum";
 import cardRoutes from "./routes/cards";
@@ -15,10 +14,8 @@ dotenv.config();
 
 const app = express();
 
-// ===== Middlewares base =====
 app.use(express.json());
 
-// ===== API routes =====
 app.use("/auth", authRoutes);
 app.use("/bizum", bizumRoutes);
 app.use("/cards", cardRoutes);
@@ -26,10 +23,8 @@ app.use("/loans", loanRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/notifications", notificationsRoutes);
 
-// ===== Static files (FRONTEND) =====
 app.use(express.static(path.join(process.cwd(), "public")));
 
-// ===== Server =====
 const PORT = process.env.PORT || 3000;
 
 (async () => {

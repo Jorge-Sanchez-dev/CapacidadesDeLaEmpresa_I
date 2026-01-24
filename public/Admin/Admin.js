@@ -15,7 +15,6 @@ async function loadDashboard(token) {
   if (!kpisEl || !recentEl) return;
 
   try {
-    // ✅ API admin bajo /api/admin
     const res = await fetch("/api/admin/dashboard", {
       headers: { Authorization: "Bearer " + token },
     });
@@ -25,7 +24,6 @@ async function loadDashboard(token) {
 
     const k = data.kpis || {};
 
-    // KPIs
     kpisEl.innerHTML = `
       <section class="info-card">
         <h2>Usuarios</h2>
@@ -54,7 +52,6 @@ async function loadDashboard(token) {
       </section>
     `;
 
-    // Actividad reciente
     const movements = data.recentMovements || [];
     if (movements.length === 0) {
       recentEl.innerHTML = `<div class="info-card"><h2>Sin actividad</h2></div>`;
@@ -117,7 +114,6 @@ async function loadUsers(token) {
   if (!list) return;
 
   try {
-    // ✅ API admin bajo /api/admin
     const res = await fetch("/api/admin/users", {
       headers: { Authorization: "Bearer " + token },
     });

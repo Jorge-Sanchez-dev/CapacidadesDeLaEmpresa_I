@@ -1,26 +1,19 @@
-// /Bizum/Bizum.js
 
-// 🔧 Cambia esto si tu API está en otra URL (por ejemplo: http://localhost:3000)
-const API_BASE_URL = ""; // vacío = mismo dominio
+const API_BASE_URL = "";
 
-// Rutas típicas (ajústalas a tu backend)
-const BIZUM_ENDPOINT = "/bizum"; // <- si tu backend usa otra, cámbiala
+const BIZUM_ENDPOINT = "/bizum";
 
-// Helpers
 const $ = (id) => document.getElementById(id);
 
 function normalizePhone(raw) {
-  // Quita espacios, guiones, paréntesis…
   return (raw || "").replace(/[^\d]/g, "");
 }
 
 function isValidSpanishMobile(phoneDigits) {
-  // 9 dígitos y empieza por 6 o 7 (móvil en España)
   return /^[67]\d{8}$/.test(phoneDigits);
 }
 
 function formatEuros(value) {
-  // Normaliza a 2 decimales
   const n = Number(value);
   if (!Number.isFinite(n)) return null;
   return Math.round(n * 100) / 100;
@@ -30,8 +23,6 @@ function setMessage(text, type = "info") {
   const el = $("transfer-message");
   if (!el) return;
   el.textContent = text;
-
-  // Si quieres clases por tipo:
   el.classList.remove("is-error", "is-success", "is-info");
   if (type === "error") el.classList.add("is-error");
   else if (type === "success") el.classList.add("is-success");
@@ -46,7 +37,6 @@ function setLoading(isLoading) {
 }
 
 function getAuthHeaders() {
-  // Si guardas el token en localStorage, úsalo
   const token = localStorage.getItem("token") || localStorage.getItem("jwt");
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
@@ -70,7 +60,6 @@ async function setGreetingFromBackend() {
 
     el.textContent = `Hola, ${data.user.name} 👋`;
 
-    // (opcional pero recomendable)
     localStorage.setItem("userName", data.user.name);
   } catch (err) {
     console.error("Error cargando saludo Bizum:", err);
@@ -86,13 +75,12 @@ async function sendBizum({ toPhone, amount, concept }) {
       ...getAuthHeaders(),
     },
     body: JSON.stringify({
-      toPhone, // "600123456"
-      amount,  // 12.34
-      concept, // "Cena"
+      toPhone,
+      amount,
+      concept,
     }),
   });
 
-  // Intenta parsear respuesta
   let data = null;
   const contentType = res.headers.get("content-type") || "";
   if (contentType.includes("application/json")) {
@@ -117,7 +105,6 @@ function clearForm() {
   form.reset();
 }
 
-// Init
 document.addEventListener("DOMContentLoaded", () => {
   setGreetingFromBackend();
   setMessage("");
@@ -136,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const concept = ($("concept")?.value || "").trim();
 
-    // Validaciones
     if (!isValidSpanishMobile(phone)) {
       setMessage(
         "Introduce un número móvil válido (9 dígitos y que empiece por 6 o 7).",
@@ -150,25 +136,18 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // ✅ Envío
     try {
       setLoading(true);
       setMessage("");
 
-      // --- MODO REAL (con backend) ---
       const result = await sendBizum({ toPhone: phone, amount, concept });
 
-      // Si tu backend devuelve algo tipo {message:"ok"} o {transactionId:"..."}
       const okMsg =
         (result && result.message) ||
         "Bizum enviado correctamente ✅";
       setMessage(okMsg, "success");
       clearForm();
-
-      // --- MODO SIMULACIÓN (si aún no tienes backend) ---
-      // await new Promise((r) => setTimeout(r, 800));
-      // setMessage(`Bizum simulado enviado a ${phone} por ${amount.toFixed(2)}€ ✅`, "success");
-      // clearForm();
+      
     } catch (err) {
       setMessage(err.message || "Error enviando el Bizum.", "error");
     } finally {

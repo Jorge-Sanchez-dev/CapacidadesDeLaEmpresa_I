@@ -1,8 +1,4 @@
-// /Tarjetas.js
 
-/* =========================
-   MODAL MENSAJES (ERRORES)
-   ========================= */
 function showModal(message, title = "Aviso") {
   const overlay = document.getElementById("modal-overlay");
   const titleEl = document.getElementById("modal-title");
@@ -30,9 +26,7 @@ function showModal(message, title = "Aviso") {
   };
 }
 
-/* =========================
-   DOM READY
-   ========================= */
+
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -40,15 +34,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  /* ---------- DOM ---------- */
+
   const greetingEl = document.getElementById("greeting");
   const grid = document.getElementById("cards-grid");
   const count = document.getElementById("cards-count");
 
-  // ✅ saldo real de la cuenta del usuario (del dashboard)
   let dashboardBalance = 0;
 
-  /* ---------- HELPERS ---------- */
   function authHeaders(extra = {}) {
     return { Authorization: "Bearer " + token, ...extra };
   }
@@ -65,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${String(m).padStart(2, "0")}/${String(y).padStart(2, "0")}`;
   }
 
-  /* ---------- FETCH DASHBOARD (para saludo + saldo real) ---------- */
   async function fetchDashboard() {
     const res = await fetch("/auth/dashboard", {
       headers: { Authorization: "Bearer " + token },
@@ -75,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return data;
   }
 
-  /* ---------- FETCH CARDS ---------- */
   async function fetchCards() {
     const res = await fetch("/cards", { headers: authHeaders() });
     const data = await res.json().catch(() => null);
@@ -83,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return data.cards || [];
   }
 
-  /* ---------- RENDER ---------- */
+
   function renderCards(cards) {
     if (!grid) return;
     grid.innerHTML = "";
@@ -93,7 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const el = document.createElement("section");
       el.className = "info-card";
 
-      // ✅ CLAVE: para DEBIT mostramos el balance REAL del dashboard
       const shownMoney =
         c.cardType === "DEBIT" ? dashboardBalance : (c.creditLimit ?? 0);
 
@@ -129,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
       grid.appendChild(el);
     });
 
-    // Toggle CVV
     document.querySelectorAll("[data-toggle]").forEach((btn) => {
       btn.onclick = () => {
         const id = btn.dataset.toggle;
@@ -140,7 +128,6 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     });
 
-    // Eliminar
     document.querySelectorAll("[data-remove]").forEach((btn) => {
       btn.onclick = async () => {
         try {
@@ -163,16 +150,10 @@ document.addEventListener("DOMContentLoaded", () => {
     renderCards(cards);
   }
 
-  /* =========================
-     CREAR TARJETA (2 “pantallas” en modales)
-     ========================= */
-
-  // Modal 1: elegir tipo
   const typeOverlay = document.getElementById("card-type-overlay");
   const typeForm = document.getElementById("card-type-form");
   const nextStepBtn = document.getElementById("next-step");
 
-  // Modal 2: crear crédito
   const creditOverlay = document.getElementById("credit-overlay");
   const creditForm = document.getElementById("credit-form");
   const creditAliasInput = document.getElementById("credit-alias");
@@ -222,12 +203,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Abrir modal 1
   document.getElementById("add-card")?.addEventListener("click", () => {
     openTypeModal();
   });
 
-  // Aceptar en modal 1
   nextStepBtn?.addEventListener("click", async () => {
     const selected = typeForm?.querySelector("input[name='cardType']:checked");
     if (!selected) {
@@ -246,12 +225,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Cancelar modal crédito
   creditCancelBtn?.addEventListener("click", () => {
     closeCreditModal();
   });
 
-  // Crear crédito desde modal 2
   creditForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -276,24 +253,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* =========================
-     ✅ INIT (orden correcto)
-     ========================= */
   (async () => {
     try {
       const data = await fetchDashboard();
 
-      // saludo
       if (data?.user?.name && greetingEl) {
         greetingEl.textContent = `Hola, ${data.user.name} 👋`;
       }
 
-      // saldo real: data.account.balance (en tu BD es "balance")
       const rawBal = data?.account?.balance;
       dashboardBalance =
         typeof rawBal === "number" ? rawBal : Number(rawBal || 0);
 
-      // ahora sí, render tarjetas (ya con saldo cargado)
       await loadAndRender();
     } catch (err) {
       console.error(err);

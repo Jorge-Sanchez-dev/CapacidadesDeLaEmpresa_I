@@ -1,4 +1,4 @@
-//controllers/adminLoanController.ts
+
 import { Request, Response } from "express";
 import Loan from "../models/Loan";
 import Notification from "../models/Notification";
@@ -34,7 +34,7 @@ export const adminApproveLoan = async (req: Request, res: Response) => {
     const adminId = (req as any).userId;
     const { id } = req.params;
 
-    const { interestAPR = 6 } = req.body; // por defecto 6% (cámbialo)
+    const { interestAPR = 6 } = req.body;
     const loan = await Loan.findById(id);
     if (!loan) return res.status(404).json({ message: "Préstamo no encontrado" });
     if (loan.status !== "PENDING") return res.status(400).json({ message: "Esta solicitud ya no está pendiente" });
