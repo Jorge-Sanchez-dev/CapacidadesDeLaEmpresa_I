@@ -23,10 +23,12 @@ app.use("/loans", loanRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/notifications", notificationsRoutes);
 
-app.use(express.static(path.join(__dirname, "..", "public")));
+const publicPath = path.join(__dirname, "..", "public");
+
+app.use(express.static(publicPath));
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "public", "login.html"));
+  res.sendFile(path.join(publicPath, "login.html"));
 });
 
 
