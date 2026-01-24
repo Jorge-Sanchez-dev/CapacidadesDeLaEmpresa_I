@@ -44,3 +44,4 @@ export function validateLocation(
   }
 
   return null;
+}
